@@ -1,66 +1,89 @@
 /********************************************************
  * PID Adaptive radiator control system
  * Code modified by Olof Björkqvist (olof@bjorkqvist.nu)
- * Code sorce from PID Example code for adptive control
- * One of the benefits of the PID library is that you can
- * change the tuning parameters at any time.  this can be
- * helpful if we want the controller to be agressive at some
- * times, and conservative at others.   in the example below
- * we set the controller to use Conservative Tuning Parameters
- * when we're near TempRadOutSet and more agressive Tuning
- * Parameters when we're farther away.
  * 
  ********************************************************/
 
-#include <PID_v1.h>
+// Define pins and other constands
+const int valvecontrolPin = 9;
+const int tempsimPin = 0;
+const int delaytime = 1000;
 
 //Define Variables we'll be connecting to. TempRadOutSet is the radiator temp setpoint
-double TempRadOutSet, Input, Output;
+double TempRadOutSet;
+int tempsimval;
 
-//Define the aggressive and conservative Tuning Parameters
-double aggKp=4, aggKi=0.2, aggKd=1;
-double consKp=1, consKi=0.05, consKd=0.25;
+// PID variabler
+double error, lasterror = 0.0, sumerror, derror, PIDvalue;
+double kp = 7;
+double ki = 0.0001;
+double kd = 0.2;
+int output = 0;
+
 // Tempcurve: TempRadOutSet=kCurve*TempOutside+mCurve
-double TempRadOutMin=15, TempRadOutMax=60, TempOutsideMin=-25;
+// TempOutsideStart=Temperature when the heating system valve is opened
+double TempOutsideStart=17, TempRadOutMax=60, TempOutsideMin=-25;
 double kCurve=0, mCurve=0;
 double TempOutside, TempRadIn, TempRadOut, TempTapwaterOut;
-
-//Specify the links and initial tuning parameters
-PID myPID(&Input, &Output, &TempRadOutSet, consKp, consKi, consKd, DIRECT);
 
 void setup()
 {
   //initialize the variables we're linked to
   // ### analogRead shall be updated to radoutThermomether when the code is merged.
-  Input = 15;
-  kCurve=(TempRadOutMax-TempRadOutMin)/(TempOutsideMin-TempRadOutMin);
+  kCurve=(TempRadOutMax-TempOutsideStart)/(TempOutsideMin-TempOutsideStart);
   mCurve=TempRadOutMax-kCurve*TempOutsideMin;
+
+  //Open valvecontrole-pin for output
+  pinMode(valvecontrolPin, OUTPUT);
+
+  //Debug temperatures
+
   TempOutside=-5;
   TempRadOut=27;
   TempRadIn=25;
   TempTapwaterOut=55;
   TempRadOutSet=40;
+  Serial.begin(9600);          //  setup serial
 
-  //turn the PID on
-  myPID.SetMode(AUTOMATIC);
+
 }
 
 void loop()
 {
-  Input = TempRadOut;
+  tempsimval = analogRead(tempsimPin);
+  TempRadOut = tempsimval*(TempRadOutMax-TempOutsideStart)/1023+TempOutsideStart;
   TempRadOutSet = kCurve*TempOutside+mCurve;
+
+  Serial.println(tempsimval);
+  Serial.println(TempRadOut);
+
+  delay(delaytime);
   
-  double gap = abs(TempRadOutSet-Input); //distance away from TempRadOutSet
-  if(gap<5)
-  {  //we're close to TempRadOutSet, use conservative tuning parameters
-    myPID.SetTunings(consKp, consKi, consKd);
-  }
-  else
-  {
-     //we're far from TempRadOutSet, use aggressive tuning parameters
-     myPID.SetTunings(aggKp, aggKi, aggKd);
-  }
+// Calculater error, sum of error over time och derror.
+
+  error = TempRadOutSet - TempRadOut;
+  sumerror += (error * delaytime);
+  derror = (error - lasterror) / delaytime;
+
+  PIDvalue = kp * error + ki * sumerror + kd * derror ;
+  output += PIDvalue;
+
+  Serial.println(output);
   
-  myPID.Compute();
-  analogWrite(3,Output);
+  // Check if output is within limits
+    if (output > 255)
+    {
+      output = 255;
+    }
+    
+    if (output < 0)
+    {
+      output = 0;
+    }
+
+  Serial.println(output);
+
+// Send result to valve
+  analogWrite(valvecontrolPin, output);
+  
 }

@@ -24,6 +24,7 @@ void setup()
 void loop()
 {
   Input = analogRead(0);
+  analogWrite(1,Input);
   myPID.Compute();
   analogWrite(3,Output);
 }

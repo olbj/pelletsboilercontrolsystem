@@ -33,8 +33,15 @@ PID::PID(double* Input, double* Output, double* Setpoint,
 
     PID::SetControllerDirection(ControllerDirection);
     PID::SetTunings(Kp, Ki, Kd);
-
-    lastTime = millis()-SampleTime;				
+// Fixe by olbj in order to avoid lastTime<0 bug
+    if (millis() < SampleTime) 
+	{
+	    lastTime = 1;
+	}
+	else
+	{
+		lastTime = millis()-SampleTime;				
+	}
 }
  
  
