@@ -19,12 +19,13 @@ void setup()
 
   //turn the PID on
   myPID.SetMode(AUTOMATIC);
+  myPID.SetSampleTime(1);
 }
 
 void loop()
 {
+  delay(500);
   Input = analogRead(0);
-  analogWrite(1,Input);
   myPID.Compute();
   analogWrite(3,Output);
 }
