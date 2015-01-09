@@ -13,7 +13,7 @@ void setup() {
   lcd.setCursor(0,0);                    // Set cursor to x=0 and y=0
   lcd.print("LCD Key Shield");           // Print text on LCD
   lcd.setCursor(0,1);
-  lcd.print("Kjell & Company");
+  lcd.print("Olof Bjorkqvist");
   delay(3000);
   lcd.clear();
   lcd.setCursor(0,0);
@@ -24,22 +24,32 @@ void loop() {
   int x;
   x = analogRead (0);                  // Read the analog value for buttons
   if (x < 100) {                       // Right button is pressed
+    lcd.setCursor(0,0);
+    lcd.print (x); 
     lcd.setCursor(0,1);
     lcd.print ("Right "); 
   }
   else if (x < 200) {                  // Up button is pressed
+    lcd.setCursor(0,0);
+    lcd.print (x); 
     lcd.setCursor(0,1);
     lcd.print ("Up    ");
   }
   else if (x < 400){                   // Down button is pressed
+    lcd.setCursor(0,0);
+    lcd.print (x); 
     lcd.setCursor(0,1);
     lcd.print ("Down  "); 
   }
   else if (x < 600){                   // Left button is pressed
+    lcd.setCursor(0,0);
+    lcd.print (x); 
     lcd.setCursor(0,1);
     lcd.print ("Left  ");
   }
   else if (x < 800){                   // Select button is pressed
+    lcd.setCursor(0,0);
+    lcd.print (x); 
     lcd.setCursor(0,1);
     lcd.print ("Select"); }
 }

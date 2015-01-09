@@ -63,6 +63,9 @@ double TempRadOutMin=15, TempRadOutMax=60, TempOutsideMin=-25;
 //Specify the links and initial tuning parameters
 PID myPID(&TempRadOut, &Output, &TempRadOutSet, consKp, consKi, consKd, DIRECT);
 
+//Specify operation mode: RunMode=0: Automatic, RunMode=1: Manual, RunMode=2: Valve exercise, RunMode=3: Setup
+int RunMode=0;
+
 void setup()
 {
   //Open serial print for debug printing
@@ -81,6 +84,9 @@ void setup()
   TempRadOutSet=40;
 
   Serial.print("Input data");
+  Serial.println();
+  Serial.print("RunMode: ");
+  Serial.print(RunMode);
   Serial.println();
   Serial.print("Input: ");
   Serial.print(Input);
@@ -243,12 +249,39 @@ void printData(DeviceAddress deviceAddress)
 
 void loop()
 {
+  switch (RunMode) {
+  case 3:
+    Serial.print("Entering setup mode");
+    Serial.println();
+    break; 
+  case 2:
+    Serial.print("Entering valve exercise mode");
+    Serial.println();
+    break; 
+  case 1:
+    Serial.print("Entering manual operation mode");
+    Serial.println();
+    break; 
+  case 0:
+    Serial.print("Entering automatic operation mode");
+    Serial.println();
+    break; 
+  }
+
   //First phase: Set up the debug variables. TempRadOut is simulated by pin 0
+  // call sensors.requestTemperatures() to issue a global temperature 
+  // request to all devices on the bus
+  Serial.print("Requesting temperatures...");
+  sensors.requestTemperatures();
+  Serial.println("DONE");
+
+  if (RunMode == 0) TempOutside=sensors.getTempC(outsideThermometer);
+  //Update the line below when manual setup interface is programmed.
+  if (RunMode == 1) TempOutside=-7.0;
   TempsimVal = analogRead(TempsimPin);
   TempRadOut = TempsimVal/1023.0*(TempRadOutMax-TempRadOutMin)+TempRadOutMin;
   Iteration += 1;
   delay(DelayTime);
-  //Debug variables ended
 
   Input = TempRadOut;
   //Tempcurve: TempRadOutSet=kCurve*TempOutside+mCurve
@@ -279,13 +312,13 @@ void loop()
   // request to all devices on the bus
   Serial.print("Requesting temperatures...");
   sensors.requestTemperatures();
-  //Serial.println("DONE");
+  Serial.println("DONE");
 
   // print the device information
-  /*printData(radiatorinThermometer);
+  printData(radiatorinThermometer);
   printData(radiatoroutThermometer);
   printData(tapwaterThermometer);
-  printData(outsideThermometer);*/
+  printData(outsideThermometer);
   Serial.print("Iteration: ");
   Serial.print(Iteration);
   Serial.println();
@@ -294,6 +327,9 @@ void loop()
   Serial.println();
   Serial.print("TempRadOut: ");
   Serial.print(TempRadOut);
+  Serial.println();
+  Serial.print("TempOutside: ");
+  Serial.print(TempOutside);
   Serial.println();
   Serial.print("TempRadOutSet: ");
   Serial.print(TempRadOutSet);
