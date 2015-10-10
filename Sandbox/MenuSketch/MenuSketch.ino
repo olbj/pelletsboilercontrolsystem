@@ -85,7 +85,7 @@ void loop()
 			{
 			Serial.print("Right button pressed");
 			Serial.println();
-			Serial.print("New button pressed");
+			Serial.print("New button pressed. Previous menu: ");
 			Serial.print(menu_array[0]);
 			Serial.print(".");
 			Serial.print(menu_array[1]);
