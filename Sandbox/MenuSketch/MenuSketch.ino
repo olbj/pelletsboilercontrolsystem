@@ -24,7 +24,13 @@ int adc_key_in= 0;
 
 //Define the menu array
 int menu_var=0;
-int menu_array[]={0, 0, 0};
+int menu_array[]={0, 0};
+int new_menu_array[]={0, 0};
+boolean menu_choice[2][2]=
+   {
+  {false, false},
+  {false, false}
+  };
 
 // read the buttons
 int read_LCD_buttons()
@@ -56,6 +62,9 @@ int read_LCD_buttons()
 
 void setup()
 {
+Serial.begin(9600);
+Serial.print("MenuSketch Started");
+Serial.println();
 	lcd.begin(16, 2);// start the library
 	lcd.setCursor(0,0);
 	lcd.print("Push the buttons"); // print a simple message
@@ -74,54 +83,112 @@ void loop()
 			lcd.print("RIGHT ");
 			if (lcd_key != last_lcd_key)
 			{
+			Serial.print("Right button pressed");
+			Serial.println();
+			Serial.print("New button pressed");
+			Serial.print(menu_array[0]);
+			Serial.print(".");
+			Serial.print(menu_array[1]);
+			Serial.print("   :");
+			Serial.println();
+			Serial.print(menu_choice[menu_array[0]][menu_array[1]]);
 				switch (menu_array[0])
 				{
 					case 0: //Menu 0.1-3
+					Serial.print("Menu 0.1-3");
+					Serial.println();
+					{
 						switch (menu_array[1])
 						{
-							case 0:
-								menu_array[0]+=1;
-							break;
-							case 1:
-								menu_array[0]+=1;
-							break;
-							case 2:
-								menu_array[0]=0;
-							break;
+							case 0: {
+								Serial.print("Menu 0.0");
+								Serial.println();
+								new_menu_array[0]+=1;
+								if (new_menu_array[0]>2) 	new_menu_array[0]=0; 
+								}
+								break;
+							case 1: {
+								Serial.print("Menu 0.1");
+								Serial.println();
+								new_menu_array[0]+=1;
+								if (new_menu_array[0]>2) 	new_menu_array[0]=0; 
+								}
+								break;
+							case 2: {
+								Serial.print("Menu 0.2");
+								Serial.println();
+								new_menu_array[0]+=1;
+								if (new_menu_array[0]>2) 	new_menu_array[0]=0; 
+								}
+								break;
 						}
+					}
 					break;
 					case 1: //Menu 1.1-3
+					Serial.print("Menu 1.1-3");
+					Serial.println();
+					{
 						switch (menu_array[1])
-						{
-							case 0:
-								menu_array[0]+=1;
+						{	
+							case 0: {
+								Serial.print("Menu 1.0");
+								Serial.println();
+								new_menu_array[0]+=1;
+								if (new_menu_array[0]>2) 	new_menu_array[0]=0; 
+								}
 								break;
-							case 1:
-								menu_array[0]+=1;
-							break;
-							case 2:
-								menu_array[0]=0;
-							break;
+							case 1: {
+								Serial.print("Menu 1.1");
+								Serial.println();
+								new_menu_array[0]+=1;
+								if (new_menu_array[0]>2) 	new_menu_array[0]=0; 
+								}
+								break;
+							case 2: {
+								Serial.print("Menu 1.2");
+								Serial.println();
+								new_menu_array[0]+=1;
+								if (new_menu_array[0]>2) 	new_menu_array[0]=0; 
+								}
+								break;
 						}
+					}
 					break;
 					case 2: //Menu 2.1-3
+					Serial.print("Menu 2.1-3");
+					Serial.println();
+					{
 						switch (menu_array[1])
 						{
-							case 0:
-								menu_array[0]+=1;
-							break;
-							case 1:
-								menu_array[0]+=1;
-							break;
-							case 2:
-								menu_array[0]=0;
-							break;
+							case 0: {
+								Serial.print("Menu 2.0");
+								Serial.println();
+								new_menu_array[0]+=1;
+								if (new_menu_array[0]>2) 	new_menu_array[0]=0; 
+								}
+								break;
+							case 1: {
+								Serial.print("Menu 2.1");
+								Serial.println();
+								new_menu_array[0]+=1;
+								if (new_menu_array[0]>2) 	new_menu_array[0]=0; 
+								}
+								break;
+							case 2: {
+								Serial.print("Menu 2.2");
+								Serial.println();
+								new_menu_array[0]+=1;
+								if (new_menu_array[0]>2) 	new_menu_array[0]=0; 
+								}
+								break;
 						}
+					}
 					break;
 				}
 			}
-		break;
+			last_lcd_key=lcd_key;
 		}
+		break;
 		case btnLEFT:
 		{ 
 			lcd.print("LEFT ");
@@ -130,51 +197,76 @@ void loop()
 				switch (menu_array[0])
 				{
 					case 0: //Menu 0.1-3
+					{
 						switch (menu_array[1])
 						{
-							case 0:
-								menu_array[0]=2;
-							break;
-							case 1:
+							case 0: {	
 								menu_array[0]-=1;
-							break;
-							case 2:
+								if (menu_array[0]<0) 	menu_array[0]=2; 
+								}
+								break;
+							case 1: {
 								menu_array[0]-=1;
-							break;
+								if (menu_array[0]<0) 	menu_array[0]=2; 
+								}
+								break;
+							case 2: {
+								menu_array[0]-=1;
+								if (menu_array[0]<0) 	menu_array[0]=2; 
+								}
+								break;
 						}
+					}
 					break;
 					case 1: //Menu 1.1-3
+					{
 						switch (menu_array[1])
 						{	
-							case 0:
-								menu_array[0]=2;
-							break;
-							case 1:
+							case 0: {
 								menu_array[0]-=1;
-							break;
-							case 2:
+								if (menu_array[0]<0) 	menu_array[0]=2; 
+								}
+								break;
+							case 1: {
 								menu_array[0]-=1;
-							break;
+								if (menu_array[0]<0) 	menu_array[0]=2; 
+								}
+								break;
+							case 2: {
+								menu_array[0]-=1;
+								if (menu_array[0]<0) 	menu_array[0]=2; 
+								}
+								break;
 						}
+					}
 					break;
 					case 2: //Menu 2.1-3
+					{
 						switch (menu_array[1])
 						{
-							case 0:
-								menu_array[0]=2;
-							break;
-							case 1:
+							case 0: {
 								menu_array[0]-=1;
-							break;
-							case 2:
+								if (menu_array[0]<0) 	menu_array[0]=2; 
+								}
+								break;
+							case 1: {
 								menu_array[0]-=1;
-							break;
+								if (menu_array[0]<0) 	menu_array[0]=2; 
+								}
+								break;
+							case 2: {
+								menu_array[0]-=1;
+								if (menu_array[0]<0) 	menu_array[0]=2; 
+								}
+								break;
 						}
+					}
 					break;
 				}
 			}
-		break;
+			last_lcd_key=lcd_key;
 		}
+		break;
 		case btnUP:
 		{
 			lcd.print("UP    ");
@@ -183,51 +275,76 @@ void loop()
 				switch (menu_array[0])
 				{
 					case 0: //Menu 0.1-3
+					{
 						switch (menu_array[1])
 						{
-							case 0:
-								menu_array[1]=2;
-							break;
-							case 1:
+							case 0: {
 								menu_array[1]-=1;
-							break;
-							case 2:
+								if (menu_array[1]<0) 	menu_array[1]=2; 
+								}
+								break;
+							case 1: {
 								menu_array[1]-=1;
-							break;
+								if (menu_array[1]<0) 	menu_array[1]=2; 
+								}
+								break;
+							case 2: {
+								menu_array[1]-=1;
+								if (menu_array[1]<0) 	menu_array[1]=2; 
+								}
+								break;
 						}
+					}
 					break;
 					case 1: //Menu 1.1-3
+					{
 						switch (menu_array[1])
 						{
-							case 0:
-								menu_array[1]=2;
-							break;
-							case 1:
+							case 0: {
 								menu_array[1]-=1;
-							break;
-							case 2:
+								if (menu_array[1]<0) 	menu_array[1]=2; 
+								}
+								break;
+							case 1: {
 								menu_array[1]-=1;
-							break;
+								if (menu_array[1]<0) 	menu_array[1]=2; 
+								}
+								break;
+							case 2: {
+								menu_array[1]-=1;
+								if (menu_array[1]<0) 	menu_array[1]=2; 
+								}
+								break;
 						}
+					}
 					break;
 					case 2: //Menu 2.1-3
+					{
 						switch (menu_array[1])
 						{
-							case 0:
-								menu_array[1]=2;
-							break;
-							case 1:
+							case 0: {
 								menu_array[1]-=1;
-							break;
-							case 2:
+								if (menu_array[1]<0) 	menu_array[1]=2; 
+								}
+								break;
+							case 1: {
 								menu_array[1]-=1;
-							break;
+								if (menu_array[1]<0) 	menu_array[1]=2; 
+								}
+								break;
+							case 2: {
+								menu_array[1]-=1;
+								if (menu_array[1]<0 ) 	menu_array[1]=2; 
+								}
+								break;
 						}
+					}
 					break;
 				}
 			}
-		break;
+			last_lcd_key=lcd_key;
 		}
+		break;
 		case btnDOWN:
 		{	
 			lcd.print("DOWN  ");
@@ -236,51 +353,76 @@ void loop()
 				switch (menu_array[0])
 				{	
 					case 0: //Menu 0.1-3
+					{	
 						switch (menu_array[1])
 						{	
-							case 0:
+							case 0: {
 								menu_array[1]+=1;
+								if (menu_array[1]>2 ) 	menu_array[1]=0; 
+								}
 							break;
-							case 1:
+							case 1: {
 								menu_array[1]+=1;
+								if (menu_array[1]>2 ) 	menu_array[1]=0; 
+								}
 							break;
-							case 2:
-								menu_array[1]=0;
+							case 2: {
+								menu_array[1]+=1;
+								if (menu_array[1]>2 ) 	menu_array[1]=0; 
+								}
 							break;
 						}
+					}
 					break;
 					case 1: //Menu 1.1-3
+					{	
 						switch (menu_array[1])
 						{
-							case 0:
+							case 0: {
 								menu_array[1]+=1;
+								if (menu_array[1]>2 ) 	menu_array[1]=0; 
+								}
 							break;
-							case 1:
+							case 1: {
 								menu_array[1]+=1;
+								if (menu_array[1]>2 ) 	menu_array[1]=0; 
+								}
 							break;
-							case 2:
-								menu_array[1]=0;
+							case 2: {
+								menu_array[1]+=1;
+								if (menu_array[1]>2 ) 	menu_array[1]=0; 
+								}
 							break;
 						}
+					}
 					break;
 					case 2: //Menu 2.1-3
+					{	
 						switch (menu_array[1])
 						{	
-							case 0:
+							case 0: {
 								menu_array[1]+=1;
+								if (menu_array[1]>2 ) 	menu_array[1]=0; 
+								}
 							break;
-							case 1:
+							case 1: {
 								menu_array[1]+=1;
+								if (menu_array[1]>2 ) 	menu_array[1]=0; 
+								}
 							break;
-							case 2:
-								menu_array[1]=0;
+							case 2: {
+								menu_array[1]+=1;
+								if (menu_array[1]>2 ) 	menu_array[1]=0; 
+								}
 							break;
 						}
+					}
 					break;
 				}
 			}
-		break;
+			last_lcd_key=lcd_key;
 		}
+		break;
 		case btnSELECT:
 		{
 			lcd.print("SELECT");
@@ -289,55 +431,111 @@ void loop()
 				switch (menu_array[0])
 				{
 					case 0: //Menu 0.1-3
+					{
 						switch (menu_array[1])
 						{
-							case 0:
+							case 0: 
+								{
+								menu_choice[menu_array[0]][menu_array[1]] = !menu_choice[menu_array[0]][menu_array[1]];
+								Serial.print(menu_choice[menu_array[0]][menu_array[1]]);
+								Serial.println();
+								}
 							break;
 							case 1:
+								{
+								menu_choice[menu_array[0]][menu_array[1]] = !menu_choice[menu_array[0]][menu_array[1]];
+								Serial.print(menu_choice[menu_array[0]][menu_array[1]]);
+								Serial.println();
+								}
 							break;
 							case 2:
+								{
+								menu_choice[menu_array[0]][menu_array[1]] = !menu_choice[menu_array[0]][menu_array[1]];
+								Serial.print(menu_choice[menu_array[0]][menu_array[1]]);
+								Serial.println();
+								}
 							break;
 						}
+					}
 					break;
 					case 1: //Menu 1.1-3
+					{
 						switch (menu_array[1])
 						{
 							case 0:
+								{
+								menu_choice[menu_array[0]][menu_array[1]] = !menu_choice[menu_array[0]][menu_array[1]];
+								Serial.print(menu_choice[menu_array[0]][menu_array[1]]);
+								Serial.println();
+								}
 							break;
 							case 1:
+								{
+								menu_choice[menu_array[0]][menu_array[1]] = !menu_choice[menu_array[0]][menu_array[1]];
+								Serial.print(menu_choice[menu_array[0]][menu_array[1]]);
+								Serial.println();
+								}
 							break;
 							case 2:
+								{
+								menu_choice[menu_array[0]][menu_array[1]] = !menu_choice[menu_array[0]][menu_array[1]];
+								Serial.print(menu_choice[menu_array[0]][menu_array[1]]);
+								Serial.println();
+								}
 							break;
 						}
+					}
 					break;
 					case 2: //Menu 2.1-3
+					{
 						switch (menu_array[1])
 						{	
 							case 0:
+								{
+								menu_choice[menu_array[0]][menu_array[1]] = !menu_choice[menu_array[0]][menu_array[1]];
+								Serial.print(menu_choice[menu_array[0]][menu_array[1]]);
+								Serial.println();
+								}
 							break;
 							case 1:
+								{
+								menu_choice[menu_array[0]][menu_array[1]] = !menu_choice[menu_array[0]][menu_array[1]];
+								Serial.print(menu_choice[menu_array[0]][menu_array[1]]);
+								Serial.println();
+								}
 							break;
 							case 2:
+								{
+								menu_choice[menu_array[0]][menu_array[1]] = !menu_choice[menu_array[0]][menu_array[1]];
+								Serial.print(menu_choice[menu_array[0]][menu_array[1]]);
+								Serial.println();
+								}
 							break;
 						}
+					}
 					break;
 				}
 			}	
-		break;
+			last_lcd_key=lcd_key;
 		}	
+		break;
 		case btnNONE:
 		{
+			menu_array[0]=new_menu_array[0];
+			menu_array[1]=new_menu_array[1];
 			lcd.setCursor(0,0);
 			lcd.print("Menu: "); // print a simple message
 			lcd.print(menu_array[0]);
 			lcd.print(".");
 			lcd.print(menu_array[1]);
+			lcd.print(" ");
+			lcd.print(menu_choice[menu_array[0]][menu_array[1]]);
 			lcd.print("                ");
 			lcd.setCursor(0,1);
 			lcd.print("NONE   ");
 			last_lcd_key=lcd_key;
-			break;
+			// delay(1999);
 		}
-
+		break;
 	}
 }
