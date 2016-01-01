@@ -5,6 +5,9 @@
 
 This program will test the LCD panel and the buttons
 Mark Bramwell, July 2010
+Program  modified to build a menu sysem by Olof Björkqvist
+olof@bjorkqvist.nu
+2016
 
 ********************************************************/
 
