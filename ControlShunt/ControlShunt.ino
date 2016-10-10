@@ -58,13 +58,13 @@ double kCurve=0, mCurve=0;
 // Define Temperature variables. 
 // TempRadOutMin = T,ie and defines outside temeparture when valve opens.
 double TempOutside, TempRadIn, TempRadOut, TempTapwaterOut;
-double TempRadOutMin=15, TempRadOutMax=60, TempOutsideMin=-25;
+double TempRadOutMin=15, TempRadOutMax=60, TempOutsideMin=-25, TempManual=35;
 
 //Specify the links and initial tuning parameters
 PID myPID(&TempRadOut, &Output, &TempRadOutSet, consKp, consKi, consKd, DIRECT);
 
-//Specify operation mode: RunMode=0: Automatic, RunMode=1: Manual, RunMode=2: Valve exercise, RunMode=3: Setup
-int RunMode=0;
+//Specify operation mode: RunMode=0: Automatic, RunMode=1: Manual, RunMode=2: Off
+int RunMode=1;
 
 void setup()
 {
@@ -277,7 +277,7 @@ void loop()
 
   if (RunMode == 0) TempOutside=sensors.getTempC(outsideThermometer);
   //Update the line below when manual setup interface is programmed.
-  if (RunMode == 1) TempOutside=-7.0;
+  if (RunMode == 1) TempOutside=4.0;
   TempsimVal = analogRead(TempsimPin);
   TempRadOut = TempsimVal/1023.0*(TempRadOutMax-TempRadOutMin)+TempRadOutMin;
   Iteration += 1;
