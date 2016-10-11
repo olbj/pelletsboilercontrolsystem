@@ -167,12 +167,7 @@ void loop()
       }
       break;
   } //end of lcd_key switch
-  // Lets start define the location of cursor
-  /*Serial.print(c[0]);
-  Serial.print(".");
-  Serial.print(c[1]);
-  Serial.print(".");
-  Serial.print(c[2]);*/
+
   // First, is it possible to change row?
   if (y != 0 && c[0]+y >= 0 &&  c[0]+y <= rows -1) 
   {  
@@ -181,34 +176,14 @@ void loop()
   }
   // Second, is it possible to change column?
   if (c[1]+x >= 0 && c[1]+x <= size[c[0]]) c[1] += x; 
-  //if (c[1]+x >= 0) c[1] += x; 
-  //c[1] += x;
 
-  //Serial.println();
-  //Serial.println(x);
-
-  //Serial.print("Begining of LCD-output...");
-  //Serial.println();
-  //lcd.print("Column 0 row 1  ");
+  // Debug print to LCD display
   lcd.setCursor(4, 1);
   lcd.print(c[0]);
   lcd.setCursor(13, 1);
   lcd.print(c[1]);
 
-  //temp_string = 'A';
-  //lcd.print(temp_string);
   last_lcd_key = lcd_key;
-
-  //Serial.print("End of loop: ");
-  //Serial.println();
-  //Serial.print(menu_array[0]);
-  //Serial.print(".");
-  //Serial.print(menu_array[1]);
-  //Serial.print(".");
-  //Serial.print(menu_array[2]);
-  //Serial.print("-");
-  //Serial.print(usage_array[menu_array[0]][menu_array[1]][menu_array[2]]);
-  //Serial.println();
 
   // delay(1999);
 }
