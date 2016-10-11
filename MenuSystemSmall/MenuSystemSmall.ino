@@ -24,10 +24,12 @@ int adc_key_in = 0;
 #define btnLEFT   3
 #define btnSELECT 4
 #define btnNONE   5
+int c[2]; //cursor position.
+
 
 //Define the menu array
-const byte rows = 5; //Number of rows in menu systems
-const byte size[rows] = {2, 2, 3, 4, 6}; //Number of columns in rows
+const byte rows = 5; //Max row in menu systems
+const byte size[rows] = {2, 2, 3, 4, 6}; //Max columns in rows
 char row0[2]; //Operations mode
 byte row1[2]; //Information mode
 byte row2[3]; //Setup mode
@@ -74,6 +76,8 @@ void setup()
   delay(1000);
   lcd.setCursor(0, 0);
   lcd.print("                "); // print a simple message
+  lcd.setCursor(0, 1);
+  lcd.print("Row   Column");
   
 }
 
@@ -97,14 +101,12 @@ void UpdateSetup()
 
 void loop()
 {
-  byte x = 0; //column
-  byte y = 0; //row
-  byte z = 0; //height
-  byte c[2]; //cursor position.
+  int x = 0; //column
+  int y = 0; //row
+  int z = 0; //height
   int setting = 0;
-  char temp_string;
-  Serial.print("Start of loop: ");
-  Serial.println();
+  //Serial.print("Start of loop: ");
+  //Serial.println();
 
   lcd_key = read_LCD_buttons();// read the buttons
   lcd.setCursor(0, 0);
@@ -128,14 +130,24 @@ void loop()
       {
         lcd.print("RIGHT ");
         if (lcd_key != last_lcd_key)
-          x = 1;
+          { x = 1;
+            Serial.println();
+            Serial.print(x);
+            Serial.print(": ");
+            Serial.print(c[1]);
+          }
       }
       break;
     case btnLEFT:
       {
         lcd.print("LEFT  ");
         if (lcd_key != last_lcd_key)
-          x = -1;
+          { x = -1;
+            Serial.println();
+            Serial.print(x);
+            Serial.print(": ");
+            Serial.print(c[1]);
+          }
       }
       break;
     case btnSELECT:
@@ -156,32 +168,39 @@ void loop()
       break;
   } //end of lcd_key switch
   // Lets start define the location of cursor
-  Serial.print(c[0]);
+  /*Serial.print(c[0]);
   Serial.print(".");
   Serial.print(c[1]);
   Serial.print(".");
-  //Serial.print(c[2]);
+  Serial.print(c[2]);*/
   // First, is it possible to change row?
-  if (y != 0 && c[0]+y >= 0 &&  c[0]+y <= size[c[0]+y]) 
+  if (y != 0 && c[0]+y >= 0 &&  c[0]+y <= rows -1) 
   {  
     c[0] += y; 
     c[1]=0;
   }
   // Second, is it possible to change column?
-  if (c[1]+x >= 0 &&  c[1]+x <= size[c[1]+x]) c[1] += x; 
+  if (c[1]+x >= 0 && c[1]+x <= size[c[0]]) c[1] += x; 
+  //if (c[1]+x >= 0) c[1] += x; 
+  //c[1] += x;
 
-  Serial.println();
+  //Serial.println();
+  //Serial.println(x);
 
-  Serial.print("Begining of LCD-output...");
-  Serial.println();
-  lcd.setCursor(0, 1);
+  //Serial.print("Begining of LCD-output...");
+  //Serial.println();
   //lcd.print("Column 0 row 1  ");
-  temp_string = 'A';
-  lcd.print(temp_string);
+  lcd.setCursor(4, 1);
+  lcd.print(c[0]);
+  lcd.setCursor(13, 1);
+  lcd.print(c[1]);
+
+  //temp_string = 'A';
+  //lcd.print(temp_string);
   last_lcd_key = lcd_key;
 
-  Serial.print("End of loop: ");
-  Serial.println();
+  //Serial.print("End of loop: ");
+  //Serial.println();
   //Serial.print(menu_array[0]);
   //Serial.print(".");
   //Serial.print(menu_array[1]);
