@@ -25,6 +25,10 @@ int adc_key_in = 0;
 #define btnSELECT 4
 #define btnNONE   5
 int c[2]; //cursor position.
+int x = 0; //column
+int y = 0; //row
+byte menu_choice = 0; // 0=choose menu, 1=enter setup, 2=update figure
+
 
 
 //Define the menu array
@@ -75,16 +79,39 @@ void setup()
   lcd.print("Push the buttons"); // print a simple message
   delay(1000);
   lcd.setCursor(0, 0);
-  lcd.print("                "); // print a simple message
-  lcd.setCursor(0, 1);
-  lcd.print("Row   Column");
-  
+  lcd.print("                "); // print a simple message  
 }
 
-void UpdateSetup()
+int UpdateSetup(byte row,byte col, int x, int y)
 {
   Serial.print("Updates setup ...  ");
   Serial.println();
+  lcd.setCursor(9,0);
+  lcd.print(x);
+  lcd.setCursor(12,0);
+  lcd.print(y);
+  lcd.setCursor(14,0);
+  lcd.print(row);
+  lcd.print(col);
+  lcd.setCursor(0,1);
+  switch (row)
+  {
+    case 0:
+      switch (col)
+      {
+        case 0:
+            lcd.print("Change Mode     ");
+        break;
+        case 1:
+            lcd.print("Set auto        ");
+        break;
+        case 2:
+            lcd.print("Set manual      ");
+        break;
+      }
+  }   
+  
+	
   /*
     RunMode         =      variable_array[0][1][0] *int(multiplier_array[0][1][0]);
     TempOutsideMin  =float(variable_array[2][1][1]) *   multiplier_array[2][1][1]
@@ -99,15 +126,8 @@ void UpdateSetup()
     aggKd           =float(variable_array[2][3][3]) *   multiplier_array[2][3][3];*/
 }
 
-void loop()
+void readkey()
 {
-  int x = 0; //column
-  int y = 0; //row
-  int z = 0; //height
-  int setting = 0;
-  //Serial.print("Start of loop: ");
-  //Serial.println();
-
   lcd_key = read_LCD_buttons();// read the buttons
   lcd.setCursor(0, 0);
   switch (lcd_key)
@@ -130,35 +150,31 @@ void loop()
       {
         lcd.print("RIGHT ");
         if (lcd_key != last_lcd_key)
-          { x = 1;
-            Serial.println();
-            Serial.print(x);
-            Serial.print(": ");
-            Serial.print(c[1]);
-          }
+          x = 1;
       }
       break;
     case btnLEFT:
       {
         lcd.print("LEFT  ");
         if (lcd_key != last_lcd_key)
-          { x = -1;
-            Serial.println();
-            Serial.print(x);
-            Serial.print(": ");
-            Serial.print(c[1]);
-          }
+          x = -1;
       }
       break;
     case btnSELECT:
       {
         lcd.print("SELECT");
         if (lcd_key != last_lcd_key)
-        {
-          //menu_choice = !menu_choice;
-          //if (menu_choice == false) UpdateSetup();
-          //if (menu_array[2] > 0) menu_array[2] = 0;
-        }
+          {
+            Serial.println();
+          Serial.print(menu_choice);
+          menu_choice += 1;
+          Serial.println();
+          if (menu_choice > 3) menu_choice = 0;
+          Serial.print(menu_choice);
+          Serial.println();
+          lcd.setCursor(15, 1);
+          lcd.print(menu_choice);
+          }
       }
       break;
     case btnNONE:
@@ -168,22 +184,47 @@ void loop()
       break;
   } //end of lcd_key switch
 
-  // First, is it possible to change row?
-  if (y != 0 && c[0]+y >= 0 &&  c[0]+y <= rows -1) 
-  {  
-    c[0] += y; 
-    c[1]=0;
-  }
-  // Second, is it possible to change column?
-  if (c[1]+x >= 0 && c[1]+x <= size[c[0]]) c[1] += x; 
-
-  // Debug print to LCD display
-  lcd.setCursor(4, 1);
-  lcd.print(c[0]);
-  lcd.setCursor(13, 1);
-  lcd.print(c[1]);
-
-  last_lcd_key = lcd_key;
 
   // delay(1999);
 }
+
+void setcolumn()
+{
+  // First shall we change row
+ if (y != 0 && c[0]+y >= 0 && c[0]+y <= rows -1) 
+    {  
+      c[0] += y; 
+      c[1]=0;
+    } 
+    // Second, shall we change column?
+    if (c[1]+x >= 0 && c[1]+x <= size[c[0]]) c[1] += x; 
+
+    // Debug print to LCD display
+    lcd.setCursor(0, 0);
+    lcd.print("       ");
+    lcd.setCursor(0, 1);
+    lcd.print("Row   Column   ");
+    lcd.setCursor(4, 1);
+    lcd.print(c[0]);
+    lcd.setCursor(13, 1);
+    lcd.print(c[1]); 
+}
+
+void loop()
+{
+  x=0;
+  y=0;
+  readkey();
+  // First, is it possible to change row or column?
+  // if (c[1] == 0) menu_choice = 0;
+  if (y != 0 || x != 0)
+  {
+    if (menu_choice == 0) setcolumn();
+    //setcolumn();
+  }
+  // Second: Shall we enter setup
+   //else UpdateSetup(c[0], c[1], x, y);
+  last_lcd_key = lcd_key;
+
+}
+
