@@ -58,7 +58,7 @@ double kCurve=0, mCurve=0;
 // Define Temperature variables. 
 // TempRadOutMin = T,ie and defines outside temeparture when valve opens.
 double TempOutside, TempRadIn, TempRadOut, TempTapwaterOut;
-double TempRadOutMin=15, TempRadOutMax=60, TempOutsideMin=-25, TempManual=35;
+double TempRadOutMin=17, TempRadOutMax=80, TempOutsideMin=-24, TempManual=50;
 
 //Specify the links and initial tuning parameters
 PID myPID(&TempRadOut, &Output, &TempRadOutSet, consKp, consKi, consKd, DIRECT);
@@ -259,8 +259,8 @@ void loop()
     Serial.println();
     break; 
   case 1:
-    Serial.print("Entering manual operation mode");
-    Serial.println();
+    /*Serial.print("Entering manual operation mode");
+    Serial.println();*/
     break; 
   case 0:
     Serial.print("Entering automatic operation mode");
@@ -271,15 +271,15 @@ void loop()
   //First phase: Set up the debug variables. TempRadOut is simulated by pin 0
   // call sensors.requestTemperatures() to issue a global temperature 
   // request to all devices on the bus
-  Serial.print("Requesting temperatures...");
+  //Serial.print("Requesting temperatures...");
   sensors.requestTemperatures();
-  Serial.println("DONE");
+  //Serial.println("DONE");
 
   if (RunMode == 0) TempOutside=sensors.getTempC(outsideThermometer);
   //Update the line below when manual setup interface is programmed.
-  if (RunMode == 1) TempOutside=4.0;
-  TempsimVal = analogRead(TempsimPin);
-  TempRadOut = TempsimVal/1023.0*(TempRadOutMax-TempRadOutMin)+TempRadOutMin;
+  if (RunMode == 1) TempOutside=-5.0;
+  /*TempsimVal = analogRead(TempsimPin);
+  TempRadOut = TempsimVal/1023.0*(TempRadOutMax-TempRadOutMin)+TempRadOutMin;*/
   Iteration += 1;
   delay(DelayTime);
 
@@ -307,7 +307,7 @@ void loop()
    analogWrite(ValveControlPin,SetValve);
 
   //Debug printing
-  delay(2000);
+  /*delay(2000);
   // call sensors.requestTemperatures() to issue a global temperature 
   // request to all devices on the bus
   Serial.print("Requesting temperatures...");
@@ -344,5 +344,5 @@ void loop()
   Serial.print(SetValve);
   Serial.println();
   Serial.println();
-  LastOutput = Output;
+  LastOutput = Output;*/
 }
