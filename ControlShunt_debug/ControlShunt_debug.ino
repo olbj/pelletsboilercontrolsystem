@@ -58,7 +58,7 @@ double kCurve=0, mCurve=0;
 // Define Temperature variables. 
 // TempRadOutMin = T,ie and defines outside temeparture when valve opens.
 double TempOutside, TempRadIn, TempRadOut, TempTapwaterOut;
-double TempRadOutMin=17, TempRadOutMax=80, TempOutsideMin=-24, TempManual=50;
+double TempRadOutMin=17, TempRadOutMax=80, TempOutsideMin=-24, TempManual=-5;
 
 //Specify the links and initial tuning parameters
 PID myPID(&TempRadOut, &Output, &TempRadOutSet, consKp, consKi, consKd, DIRECT);
@@ -277,9 +277,10 @@ void loop()
 
   if (RunMode == 0) TempOutside=sensors.getTempC(outsideThermometer);
   //Update the line below when manual setup interface is programmed.
-  if (RunMode == 1) TempOutside=-5.0;
-  TempsimVal = analogRead(TempsimPin);
-  TempRadOut = TempsimVal/1023.0*(TempRadOutMax-TempRadOutMin)+TempRadOutMin;
+  if (RunMode == 1) TempOutside=TempManual;
+  /*TempsimVal = analogRead(TempsimPin);
+  TempRadOut = TempsimVal/1023.0*(TempRadOutMax-TempRadOutMin)+TempRadOutMin;*/
+  TempRadOut=sensors.getTempC(radiatoroutThermometer);
   Iteration += 1;
   delay(DelayTime);
 
@@ -299,15 +300,15 @@ void loop()
   }
   
   myPID.Compute();
-//  SetValve = int (Output+0.5);
-   SetValve += int(Output - LastOutput + 0.5);
+  SetValve = int (Output+0.5);
+//   SetValve += int(Output - LastOutput + 0.5);
    if(SetValve > 255) SetValve = 255;
    if(SetValve < 0) SetValve = 0;
    //LastOutput = Output;
    analogWrite(ValveControlPin,SetValve);
 
   //Debug printing
-  delay(2000);
+  delay(20);
   // call sensors.requestTemperatures() to issue a global temperature 
   // request to all devices on the bus
   Serial.print("Requesting temperatures...");
