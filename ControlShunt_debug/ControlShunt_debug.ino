@@ -51,8 +51,10 @@ int TempsimVal;
 long Iteration=0;
 
 //Define the aggressive and conservative Tuning Parameters
-double aggKp=4, aggKi=0.2, aggKd=1;
-double consKp=1, consKi=0.05, consKd=0.25;
+//double aggKp=4, aggKi=0.2, aggKd=1;
+//double consKp=1, consKi=0.05, consKd=0.25;
+double aggKp=40, aggKi=2, aggKd=10;
+double consKp=10, consKi=0.5, consKd=2.5;
 double kCurve=0, mCurve=0;
 
 // Define Temperature variables. 
