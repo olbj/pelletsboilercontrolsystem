@@ -52,7 +52,8 @@ long Iteration=0;
 
 //Define the aggressive and conservative Tuning Parameters
 double aggKp=4, aggKi=0.2, aggKd=1;
-double consKp=1, consKi=0.05, consKd=0.25;
+double consKp=2, consKi=0.2, consKd=0.7;
+//double consKp=1, consKi=0.05, consKd=0.25;
 double kCurve=0, mCurve=0;
 
 // Define Temperature variables. 
