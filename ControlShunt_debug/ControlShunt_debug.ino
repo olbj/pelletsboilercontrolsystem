@@ -55,7 +55,7 @@ long Iteration=0;
 //double consKp=1, consKi=0.05, consKd=0.25;
 //double aggKp=40, aggKi=2, aggKd=10;
 double aggKp=20, aggKi=2, aggKd=10;
-double consKp=1, consKi=0.2, consKd=0.8;
+double consKp=1, consKi=0.02, consKd=0.2;
 
 //double consKp=10, consKi=0.5, consKd=2.5;
 double kCurve=0, mCurve=0;
@@ -88,9 +88,9 @@ void setup()
   TempTapwaterOut=55;
   TempRadOutSet=40;
   // 17-01-11 Debug setting for PID regulator. Remove when finished
-  // aggKp = consKp;
-  // aggKi = consKi;
-  // aggKd = consKd;
+  aggKp = consKp;
+  aggKi = consKi;
+  aggKd = consKd;
 
   Serial.print("Input data");
   Serial.println();
