@@ -34,18 +34,19 @@ color lightgreen  = color(120,255,120); //
 color lightblue  = color(0,255,255); //Trad-in
 color lightyellow = color(255,255,120); //
 color grey = color(230,230,230);
+float[] tempHistory = new float[1000*7/8-1000/16+1];
 
 
 
 void setup() {
 
-  println(Serial.list()); // prints the active COM-port list
+  //println(Serial.list()); // prints the active COM-port list
   String arduinoPort = Serial.list()[3]; //Update this according to listning in consol
   
   port = new Serial(this, arduinoPort, 115200);
   
-  //fill(0);
-  xdisp=1000; //<>//
+  //fill(0); //<>//
+  xdisp=1000;
   ydisp=800;
   xa=xdisp/16;
   xb=xdisp*7/8;
@@ -143,15 +144,44 @@ void setup() {
 }// end setup()
 
 void draw() {
+  float ypoint;
   if (mousePressed){
     mouseclick();
   }
-  stroke(green);
+  /*//draw graph
+ stroke(0);
+ fill(255,255,255);
+ rect(90,80,100,100);
+ for (int index = 0; index<xb-xa; index++)
+ { 
+ if(index == xb-xa)
+ tempHistory[index] = tempC;
+ else
+ tempHistory[index] = tempHistory[index + 1];
+ point(90 + index, 180 - tempHistory[index]); 
+ }*/
+  
+
   strokeWeight(4);
-  point (xa+n, ya+(yb-ya)/2+10*sin(n/5));
+  ypoint = ya+(yb-ya)/2+10*sin(n/5);
+  //println(ypoint);
+  for (int index = 0; index<xb-xa+1; index++) { //<>//
+    println(index);
+    if (index == xb-xa) {
+      tempHistory[index] = ypoint;
+      println("ypoint set");}
+    else {
+      stroke(255,255,255);
+      point (xa+index, tempHistory[index]);
+      tempHistory[index] = tempHistory[index + 1];
+    }
+    println(tempHistory[index]);
+  stroke(green);
+  point (xa+index, tempHistory[index]);
+  }
   noStroke();
   n++;
-  println("Stroke ended");
+  //println("Stroke ended");
 }
 
 void mouseclick(){
