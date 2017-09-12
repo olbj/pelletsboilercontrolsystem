@@ -33,6 +33,7 @@ color lightred  = color(255,50,50); //
 color lightgreen  = color(120,255,120); //
 color lightblue  = color(0,255,255); //Trad-in
 color lightyellow = color(255,255,120); //
+color grey = color(230,230,230);
 
 
 
@@ -59,25 +60,36 @@ void setup() {
   size(1000, 800); // UI-size
   rect(xa, ya, xb-xa, yb-ya);  // Draw the graph window
     // Ritar upp boxar
+  stroke(grey);
   rect(xa, ya/4, 2.5*xbox, ybox);    // Draw the Mode-box
-  rect(xa+xboxdiff, ya/4, xbox, ybox);    // Draw the Set Tout-box
-  rect(xa+xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set Tout-box
-  rect(xa+2*xboxdiff, ya/4, xbox, ybox);    // Draw the Set Tout-box
-  rect(xa+2*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set Tout-box
-  rect(xa+3*xboxdiff, ya/4, xbox, ybox);    // Draw the Set Tout-box
-  rect(xa+3*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set Tout-box
-  rect(xa+4*xboxdiff, ya/4, xbox, ybox);    // Draw the Set Tout-box
-  rect(xa+4*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set Tout-box
-  rect(xa+5*xboxdiff, ya/4, xbox, ybox);    // Draw the Set Tout-box
-  rect(xa+5*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set Tout-box
-  //rect(xa+150, ya/4+ybox, 2*xbox, ybox);    // Draw the Set Tout-box
+  rect(xa+xboxdiff, ya/4, xbox, ybox);    // Draw the Set Trad-
+  rect(xa+xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set Trad+
+  rect(xa+2*xboxdiff, ya/4, xbox, ybox);    // Draw the Set Tout-
+  rect(xa+2*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set Tout+
+  rect(xa+3*xboxdiff, ya/4, xbox, ybox);    // Draw the Set P-
+  rect(xa+3*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set P+
+  rect(xa+4*xboxdiff, ya/4, xbox, ybox);    // Draw the Set I-
+  rect(xa+4*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set I+
+  rect(xa+5*xboxdiff, ya/4, xbox, ybox);    // Draw the Set D-
+  rect(xa+5*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set D+
+  stroke(black);
+  strokeWeight(2);
+  noFill();
+  rect(xa, ya/4, 2.5*xbox, ybox);
+  rect(xa+xboxdiff, ya/4, 2*xbox, ybox);
+  rect(xa+2*xboxdiff, ya/4, 2*xbox, ybox);
+  rect(xa+3*xboxdiff, ya/4, 2*xbox, ybox);
+  rect(xa+4*xboxdiff, ya/4, 2*xbox, ybox);  
+  rect(xa+5*xboxdiff, ya/4, 2*xbox, ybox);
   smooth();
   PFont font;
   font = createFont("Arial",8,true); // Arial, 16 point, anti-aliasing on
+  stroke(black);
   fill(0);
   textFont(font);
  
   // Draw the grading lines on left side with every 5 line longer
+    strokeWeight(0);
     for(y=yb ; y>ya ; y=y-(yb-ya)/100) {
       if ( n == 5*k) { x=10; }
       else { x=0; }
@@ -131,10 +143,138 @@ void setup() {
 }// end setup()
 
 void draw() {
+  if (mousePressed){
+    mouseclick();
+  }
   stroke(green);
   strokeWeight(4);
-  point (xa+n, yb-0.3*pow(n,1.3));
+  point (xa+n, ya+(yb-ya)/2+10*sin(n/5));
   noStroke();
   n++;
   println("Stroke ended");
+}
+
+void mouseclick(){
+  int delaytime=500;
+   if (mousePressed && mouseX<xa+2.5*xbox && mouseX>xa && mouseY<ya/4+ybox && mouseY>ya/4 ){ //Mode start
+     if (k == 0){
+       fill(255, 91, 91);
+       k=1;}
+       else{
+       fill(255, 255, 255);
+       k=0;}
+       noStroke();
+       rect(xa, ya/4, 2.5*xbox, ybox);
+  delay(delaytime);
+ }//Mode end
+  if (mousePressed && mouseX<xa+xboxdiff+xbox && mouseX>xa+xboxdiff && mouseY<ya/4+ybox && mouseY>ya/4 ){ //Trad- xa+xboxdiff, ya/4, xbox, ybox
+     if (k == 0){
+       fill(255, 91, 91);
+       k=1;}
+       else{
+       fill(255, 255, 255);
+       k=0;}
+       noStroke();
+       rect(xa+xboxdiff, ya/4, xbox, ybox);
+  delay(delaytime);
+ }
+  if (mousePressed && mouseX<xa+xboxdiff+xbox+xbox && mouseX>xa+xboxdiff+xbox && mouseY<ya/4+ybox && mouseY>ya/4 ){ //Trad+
+     if (k == 0){
+       fill(255, 91, 91);
+       k=1;}
+       else{
+       fill(255, 255, 255);
+       k=0;}
+       noStroke();
+       rect(xa+xboxdiff+xbox, ya/4, xbox, ybox);
+  delay(delaytime);
+ }
+  if (mousePressed && mouseX<xa+2*xboxdiff+xbox && mouseX>xa+2*xboxdiff && mouseY<ya/4+ybox && mouseY>ya/4 ){ //Tout-
+     if (k == 0){
+       fill(255, 91, 91);
+       k=1;}
+       else{
+       fill(255, 255, 255);
+       k=0;}
+       noStroke();
+       rect(xa+2*xboxdiff, ya/4, xbox, ybox);
+  delay(delaytime);
+ }
+  if (mousePressed && mouseX<xa+2*xboxdiff+xbox+xbox && mouseX>xa+2*xboxdiff+xbox && mouseY<ya/4+ybox && mouseY>ya/4 ){ //Tout+
+     if (k == 0){
+       fill(255, 91, 91);
+       k=1;}
+       else{
+       fill(255, 255, 255);
+       k=0;}
+       noStroke();
+       rect(xa+2*xboxdiff+xbox, ya/4, xbox, ybox);
+  delay(delaytime);
+ }
+  if (mousePressed && mouseX<xa+3*xboxdiff+xbox && mouseX>xa+3*xboxdiff && mouseY<ya/4+ybox && mouseY>ya/4 ){ //P-
+     if (k == 0){
+       fill(255, 91, 91);
+       k=1;}
+       else{
+       fill(255, 255, 255);
+       k=0;}
+       noStroke();
+       rect(xa+3*xboxdiff, ya/4, xbox, ybox);
+  delay(delaytime);
+ }
+  if (mousePressed && mouseX<xa+3*xboxdiff+xbox+xbox && mouseX>xa+3*xboxdiff+xbox && mouseY<ya/4+ybox && mouseY>ya/4 ){ //P+
+     if (k == 0){
+       fill(255, 91, 91);
+       k=1;}
+       else{
+       fill(255, 255, 255);
+       k=0;}
+       noStroke();
+       rect(xa+3*xboxdiff+xbox, ya/4, xbox, ybox);
+  delay(delaytime);
+ }
+  if (mousePressed && mouseX<xa+4*xboxdiff+xbox && mouseX>xa+4*xboxdiff && mouseY<ya/4+ybox && mouseY>ya/4 ){ //I-
+     if (k == 0){
+       fill(255, 91, 91);
+       k=1;}
+       else{
+       fill(255, 255, 255);
+       k=0;}
+       noStroke();
+       rect(xa+4*xboxdiff, ya/4, xbox, ybox);
+  delay(delaytime);
+ }
+  if (mousePressed && mouseX<xa+4*xboxdiff+xbox+xbox && mouseX>xa+4*xboxdiff+xbox && mouseY<ya/4+ybox && mouseY>ya/4 ){ //I+
+     if (k == 0){
+       fill(255, 91, 91);
+       k=1;}
+       else{
+       fill(255, 255, 255);
+       k=0;}
+       noStroke();
+       rect(xa+4*xboxdiff+xbox, ya/4, xbox, ybox);
+  delay(delaytime);
+ }
+  if (mousePressed && mouseX<xa+5*xboxdiff+xbox && mouseX>xa+5*xboxdiff && mouseY<ya/4+ybox && mouseY>ya/4 ){ //D-
+     if (k == 0){
+       fill(255, 91, 91);
+       k=1;}
+       else{
+       fill(255, 255, 255);
+       k=0;}
+       noStroke();
+       rect(xa+5*xboxdiff, ya/4, xbox, ybox);
+  delay(delaytime);
+ }
+  if (mousePressed && mouseX<xa+5*xboxdiff+xbox+xbox && mouseX>xa+5*xboxdiff+xbox && mouseY<ya/4+ybox && mouseY>ya/4 ){ //D+
+     if (k == 0){
+       fill(255, 91, 91);
+       k=1;}
+       else{
+       fill(255, 255, 255);
+       k=0;}
+       noStroke();
+       rect(xa+5*xboxdiff+xbox, ya/4, xbox, ybox);
+  delay(delaytime);
+ }
 }
