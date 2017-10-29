@@ -20,9 +20,12 @@
 import processing.serial.*; //import the Serial library
 
 Serial port; // Create object from Serial class
-int x,y,n,k,val,val1,mousedown,tid,fan, valold;
+int x,xtext,y,n,k,val,val1,mousedown,tid,fan, valold;
+int trad,tout;
+float p,i,d;
 int count1,count2,count,counting, energytab;
 int xdisp,ydisp,xa,xb,ya,yb,xbox,ybox,xboxdiff;
+String boxtext;
 
 color red = color(255,0,0); // PID-signal
 color green = color(0,255,0); //Ttap-out
@@ -45,6 +48,13 @@ void setup() {
   
   port = new Serial(this, arduinoPort, 115200);
   
+ //default values for the control system
+  trad=42;
+  tout=5;
+  p=3;
+  i=1;
+  d=1;
+  
   //fill(0); //<>//
   xdisp=1000;
   ydisp=800;
@@ -62,6 +72,8 @@ void setup() {
   rect(xa, ya, xb-xa, yb-ya);  // Draw the graph window
     // Ritar upp boxar
   stroke(grey);
+  strokeWeight(1);
+  fill(255,255,255);
   rect(xa, ya/4, 2.5*xbox, ybox);    // Draw the Mode-box
   rect(xa+xboxdiff, ya/4, xbox, ybox);    // Draw the Set Trad-
   rect(xa+xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set Trad+
@@ -73,15 +85,6 @@ void setup() {
   rect(xa+4*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set I+
   rect(xa+5*xboxdiff, ya/4, xbox, ybox);    // Draw the Set D-
   rect(xa+5*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set D+
-  stroke(black);
-  strokeWeight(2);
-  noFill();
-  rect(xa, ya/4, 2.5*xbox, ybox);
-  rect(xa+xboxdiff, ya/4, 2*xbox, ybox);
-  rect(xa+2*xboxdiff, ya/4, 2*xbox, ybox);
-  rect(xa+3*xboxdiff, ya/4, 2*xbox, ybox);
-  rect(xa+4*xboxdiff, ya/4, 2*xbox, ybox);  
-  rect(xa+5*xboxdiff, ya/4, 2*xbox, ybox);
   smooth();
   PFont font;
   font = createFont("Arial",8,true); // Arial, 16 point, anti-aliasing on
@@ -129,22 +132,20 @@ void setup() {
     text("Set P:", xa+3*xboxdiff, ya/8+10);// Draw the T1 text
     text("Set I:", xa+4*xboxdiff, ya/8+10);// Draw the T1 text
     text("Set D:", xa+5*xboxdiff, ya/8+10);// Draw the T1 text
-    textSize(10);
-    text("-", xa+1*xboxdiff+4, ya/8+25);// Draw the T1 + text
-    text("-", xa+2*xboxdiff+4, ya/8+25);// Draw the T1 + text
-    text("-", xa+3*xboxdiff+4, ya/8+25);// Draw the T1 + text
-    text("-", xa+4*xboxdiff+4, ya/8+25);// Draw the T1 + text
-    text("-", xa+5*xboxdiff+4, ya/8+25);// Draw the T1 + text
-    text("+", xa+1*xboxdiff+70, ya/8+25);// Draw the T1 + text
-    text("+", xa+2*xboxdiff+70, ya/8+25);// Draw the T1 + text
-    text("+", xa+3*xboxdiff+70, ya/8+25);// Draw the T1 + text
-    text("+", xa+4*xboxdiff+70, ya/8+25);// Draw the T1 + text
-    text("+", xa+5*xboxdiff+70, ya/8+25);// Draw the T1 + text
+    restorebox();
     n=0;
+    k=0;
 }// end setup()
+
+
+
+
+
+
 
 void draw() {
   float ypoint;
+  int index;
   if (mousePressed){
     mouseclick();
   }
@@ -161,28 +162,44 @@ void draw() {
  point(90 + index, 180 - tempHistory[index]); 
  }*/
   
-
-  strokeWeight(4);
-  ypoint = ya+(yb-ya)/2+10*sin(n/5);
+  ypoint = ya+(yb-ya)/2+15*sin(n/5);
   //println(ypoint);
-  for (int index = 0; index<xb-xa+1; index++) { //<>//
-    println(index);
+  /*for (int index = 0; index<xb-xa+1; index++) { //<>//
+    //println(index);
     if (index == xb-xa) {
       tempHistory[index] = ypoint;
-      println("ypoint set");}
+      //println("ypoint set");
+    }
     else {
+      strokeWeight(5);
       stroke(255,255,255);
       point (xa+index, tempHistory[index]);
       tempHistory[index] = tempHistory[index + 1];
     }
-    println(tempHistory[index]);
+    //println(tempHistory[index]);
+  strokeWeight(4);
   stroke(green);
   point (xa+index, tempHistory[index]);
   }
   noStroke();
-  n++;
+  n++;*/
   //println("Stroke ended");
+  strokeWeight(4);
+  stroke(green);
+  for (index = 0; index<xb-xa; index++){
+    ypoint = ya+(yb-ya)/2+15*sin(index/5);
+    point(xa+index, ypoint);
+  }
+  index =0;
 }
+
+
+
+
+
+
+
+
 
 void mouseclick(){
   int delaytime=500;
@@ -198,113 +215,89 @@ void mouseclick(){
   delay(delaytime);
  }//Mode end
   if (mousePressed && mouseX<xa+xboxdiff+xbox && mouseX>xa+xboxdiff && mouseY<ya/4+ybox && mouseY>ya/4 ){ //Trad- xa+xboxdiff, ya/4, xbox, ybox
-     if (k == 0){
-       fill(255, 91, 91);
-       k=1;}
-       else{
-       fill(255, 255, 255);
-       k=0;}
-       noStroke();
-       rect(xa+xboxdiff, ya/4, xbox, ybox);
+       trad--;
   delay(delaytime);
  }
   if (mousePressed && mouseX<xa+xboxdiff+xbox+xbox && mouseX>xa+xboxdiff+xbox && mouseY<ya/4+ybox && mouseY>ya/4 ){ //Trad+
-     if (k == 0){
-       fill(255, 91, 91);
-       k=1;}
-       else{
-       fill(255, 255, 255);
-       k=0;}
-       noStroke();
-       rect(xa+xboxdiff+xbox, ya/4, xbox, ybox);
+       trad++;
   delay(delaytime);
  }
   if (mousePressed && mouseX<xa+2*xboxdiff+xbox && mouseX>xa+2*xboxdiff && mouseY<ya/4+ybox && mouseY>ya/4 ){ //Tout-
-     if (k == 0){
-       fill(255, 91, 91);
-       k=1;}
-       else{
-       fill(255, 255, 255);
-       k=0;}
-       noStroke();
-       rect(xa+2*xboxdiff, ya/4, xbox, ybox);
+       tout--;
   delay(delaytime);
  }
   if (mousePressed && mouseX<xa+2*xboxdiff+xbox+xbox && mouseX>xa+2*xboxdiff+xbox && mouseY<ya/4+ybox && mouseY>ya/4 ){ //Tout+
-     if (k == 0){
-       fill(255, 91, 91);
-       k=1;}
-       else{
-       fill(255, 255, 255);
-       k=0;}
-       noStroke();
-       rect(xa+2*xboxdiff+xbox, ya/4, xbox, ybox);
+       tout++;
   delay(delaytime);
  }
   if (mousePressed && mouseX<xa+3*xboxdiff+xbox && mouseX>xa+3*xboxdiff && mouseY<ya/4+ybox && mouseY>ya/4 ){ //P-
-     if (k == 0){
-       fill(255, 91, 91);
-       k=1;}
-       else{
-       fill(255, 255, 255);
-       k=0;}
-       noStroke();
-       rect(xa+3*xboxdiff, ya/4, xbox, ybox);
+       p=p-0.1;
   delay(delaytime);
  }
   if (mousePressed && mouseX<xa+3*xboxdiff+xbox+xbox && mouseX>xa+3*xboxdiff+xbox && mouseY<ya/4+ybox && mouseY>ya/4 ){ //P+
-     if (k == 0){
-       fill(255, 91, 91);
-       k=1;}
-       else{
-       fill(255, 255, 255);
-       k=0;}
-       noStroke();
-       rect(xa+3*xboxdiff+xbox, ya/4, xbox, ybox);
+       p=p+0.1;
   delay(delaytime);
  }
   if (mousePressed && mouseX<xa+4*xboxdiff+xbox && mouseX>xa+4*xboxdiff && mouseY<ya/4+ybox && mouseY>ya/4 ){ //I-
-     if (k == 0){
-       fill(255, 91, 91);
-       k=1;}
-       else{
-       fill(255, 255, 255);
-       k=0;}
-       noStroke();
-       rect(xa+4*xboxdiff, ya/4, xbox, ybox);
-  delay(delaytime);
+       i=i-0.1;
+   delay(delaytime);
  }
   if (mousePressed && mouseX<xa+4*xboxdiff+xbox+xbox && mouseX>xa+4*xboxdiff+xbox && mouseY<ya/4+ybox && mouseY>ya/4 ){ //I+
-     if (k == 0){
-       fill(255, 91, 91);
-       k=1;}
-       else{
-       fill(255, 255, 255);
-       k=0;}
-       noStroke();
-       rect(xa+4*xboxdiff+xbox, ya/4, xbox, ybox);
-  delay(delaytime);
+       i=i+0.1;
+   delay(delaytime);
  }
   if (mousePressed && mouseX<xa+5*xboxdiff+xbox && mouseX>xa+5*xboxdiff && mouseY<ya/4+ybox && mouseY>ya/4 ){ //D-
-     if (k == 0){
-       fill(255, 91, 91);
-       k=1;}
-       else{
-       fill(255, 255, 255);
-       k=0;}
-       noStroke();
-       rect(xa+5*xboxdiff, ya/4, xbox, ybox);
+       d=d-0.1;
   delay(delaytime);
  }
   if (mousePressed && mouseX<xa+5*xboxdiff+xbox+xbox && mouseX>xa+5*xboxdiff+xbox && mouseY<ya/4+ybox && mouseY>ya/4 ){ //D+
-     if (k == 0){
-       fill(255, 91, 91);
-       k=1;}
-       else{
-       fill(255, 255, 255);
-       k=0;}
-       noStroke();
-       rect(xa+5*xboxdiff+xbox, ya/4, xbox, ybox);
+       d=d+0.1;
   delay(delaytime);
  }
+ restorebox();
+}
+
+void restorebox(){
+  stroke(grey);
+  strokeWeight(1);
+  //noFill();
+  fill(255,255,255);
+  rect(xa, ya/4, 2.5*xbox, ybox);    // Draw the Mode-box
+  rect(xa+xboxdiff, ya/4, xbox, ybox);    // Draw the Set Trad-
+  rect(xa+xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set Trad+
+  rect(xa+2*xboxdiff, ya/4, xbox, ybox);    // Draw the Set Tout-
+  rect(xa+2*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set Tout+
+  rect(xa+3*xboxdiff, ya/4, xbox, ybox);    // Draw the Set P-
+  rect(xa+3*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set P+
+  rect(xa+4*xboxdiff, ya/4, xbox, ybox);    // Draw the Set I-
+  rect(xa+4*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set I+
+  rect(xa+5*xboxdiff, ya/4, xbox, ybox);    // Draw the Set D-
+  rect(xa+5*xboxdiff+xbox, ya/4, xbox, ybox);    // Draw the Set D+
+  stroke(black);
+  strokeWeight(2);
+  noFill();
+  rect(xa, ya/4, 2.5*xbox, ybox);
+  rect(xa+xboxdiff, ya/4, 2*xbox, ybox);
+  rect(xa+2*xboxdiff, ya/4, 2*xbox, ybox);
+  rect(xa+3*xboxdiff, ya/4, 2*xbox, ybox);
+  rect(xa+4*xboxdiff, ya/4, 2*xbox, ybox);  
+  rect(xa+5*xboxdiff, ya/4, 2*xbox, ybox);
+  fill(0);
+  textSize(10);
+  text("-", xa+1*xboxdiff+4, ya/8+25);// Draw the T1 + text
+  text("-", xa+2*xboxdiff+4, ya/8+25);// Draw the T1 + text
+  text("-", xa+3*xboxdiff+4, ya/8+25);// Draw the T1 + text
+  text("-", xa+4*xboxdiff+4, ya/8+25);// Draw the T1 + text
+  text("-", xa+5*xboxdiff+4, ya/8+25);// Draw the T1 + text
+  text("+", xa+1*xboxdiff+70, ya/8+25);// Draw the T1 + text
+  text("+", xa+2*xboxdiff+70, ya/8+25);// Draw the T1 + text
+  text("+", xa+3*xboxdiff+70, ya/8+25);// Draw the T1 + text
+  text("+", xa+4*xboxdiff+70, ya/8+25);// Draw the T1 + text
+  text("+", xa+5*xboxdiff+70, ya/8+25);// Draw the T1 + text
+  textSize(14);
+  text(nf(trad,2), xa+1*xboxdiff+32, ya/4+ybox/2+5);// Draw the T1 + text
+  text(nf(tout,2), xa+2*xboxdiff+32, ya/4+ybox/2+5);// Draw the T1 + text
+  text(nf(p,1,1), xa+3*xboxdiff+32, ya/4+ybox/2+5);// Draw the T1 + text
+  text(nf(i,1,1), xa+4*xboxdiff+32, ya/4+ybox/2+5);// Draw the T1 + text
+  text(nf(d,1,1), xa+5*xboxdiff+32, ya/4+ybox/2+5);// Draw the T1 + text
 }
