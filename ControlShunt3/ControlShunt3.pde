@@ -37,7 +37,7 @@ color lightgreen  = color(120,255,120); //
 color lightblue  = color(0,255,255); //Trad-in
 color lightyellow = color(255,255,120); //
 color grey = color(230,230,230);
-float[] tempHistory = new float[1000*7/8-1000/16+1];
+float[] tempHistory = new float[1000*7/8-1000/16+2];
 
 
 
@@ -95,9 +95,9 @@ void setup() {
   // Draw the grading lines on left side with every 5 line longer
     strokeWeight(0);
     for(y=yb ; y>ya ; y=y-(yb-ya)/100) {
-      if ( n == 5*k) { x=10; }
+      if ( n == 5*k) { x=5; }
       else { x=0; }
-    line(xa-5-x, y, xa-5+10, y); // Draw the line
+    line(xa-5-x, y, xa-5+5, y); // Draw the line
     n++;
     if ( n == 5*(k+1)) {k++;}
     }
@@ -105,9 +105,9 @@ void setup() {
     k=0;
     y=0;
     for(x=xa ; x<xb ; x=x+(xb-xa)/100) {
-      if ( n == 5*k) { y=10; }
+      if ( n == 5*k) { y=5; }
       else { y=0; }
-    line(x, yb-5, x, yb+5+y); // Draw the line
+    line(x, yb-0, x, yb+5+y); // Draw the line
     n++;
     if ( n == 5*(k+1)) {k++;}
     }
@@ -144,52 +144,47 @@ void setup() {
 
 
 void draw() {
+  delay(100);
   float ypoint;
+  float oldpoint;
+  float newpoint;
   int index;
   if (mousePressed){
     mouseclick();
   }
-  /*//draw graph
- stroke(0);
- fill(255,255,255);
- rect(90,80,100,100);
- for (int index = 0; index<xb-xa; index++)
- { 
- if(index == xb-xa)
- tempHistory[index] = tempC;
- else
- tempHistory[index] = tempHistory[index + 1];
- point(90 + index, 180 - tempHistory[index]); 
- }*/
-  
-  ypoint = ya+(yb-ya)/2+15*sin(n/5);
-  //println(ypoint);
-  /*for (int index = 0; index<xb-xa+1; index++) { //<>//
-    //println(index);
-    if (index == xb-xa) {
-      tempHistory[index] = ypoint;
-      //println("ypoint set");
-    }
-    else {
-      strokeWeight(5);
-      stroke(255,255,255);
+  // Reset graph
+restoregraph();
+
+ //draw graph
+ 
+  ypoint = ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa));
+  //println(ypoint); //<>//
+  newpoint = ypoint;
+  //println(newpoint);
+  for (index = 0; index<xb-xa+1; index++){ //<>//
+    oldpoint=tempHistory[index+1];
+    tempHistory[index+1] = newpoint;
+    //println(tempHistory[index+1]);
+    newpoint = oldpoint;
+    //println(tempHistory);
+  }
+  tempHistory[0] = ypoint;
+  strokeWeight(3);
+  stroke(black);
+  fill(black);
+  for (index = 1; index<xb-xa; index++){
+    /*for(int yindex = 0 ; yindex < abs(tempHistory[index-1]-tempHistory[index]); yindex++){
+      point (xa+index, tempHistory[index-1]+tempHistory[index-1]-tempHistory[index]);
+    }*/
+    if (tempHistory[index] > 0 ){
+      /*point (lerp(xa, xa+index, 0.25), lerp(tempHistory[index-1], tempHistory[index], 0.25));
+      point (lerp(xa, xa+index, 0.5), lerp(tempHistory[index-1], tempHistory[index], 0.5));
+      point (lerp(xa, xa+index, 0.75), lerp(tempHistory[index-1], tempHistory[index], 0.75));*/
+      //println(tempHistory[index]);
       point (xa+index, tempHistory[index]);
-      tempHistory[index] = tempHistory[index + 1];
     }
-    //println(tempHistory[index]);
-  strokeWeight(4);
-  stroke(green);
-  point (xa+index, tempHistory[index]);
   }
-  noStroke();
-  n++;*/
-  //println("Stroke ended");
-  strokeWeight(4);
-  stroke(green);
-  for (index = 0; index<xb-xa; index++){
-    ypoint = ya+(yb-ya)/2+15*sin(index/5);
-    point(xa+index, ypoint);
-  }
+  n++;
   index =0;
 }
 
@@ -300,4 +295,14 @@ void restorebox(){
   text(nf(p,1,1), xa+3*xboxdiff+32, ya/4+ybox/2+5);// Draw the T1 + text
   text(nf(i,1,1), xa+4*xboxdiff+32, ya/4+ybox/2+5);// Draw the T1 + text
   text(nf(d,1,1), xa+5*xboxdiff+32, ya/4+ybox/2+5);// Draw the T1 + text
+}
+
+void restoregraph(){
+  stroke(black);
+  strokeWeight(1);
+  fill(255,255,255);
+  rect(xa, ya, xb-xa, yb-ya);
+}
+
+void drappoint(){
 }
