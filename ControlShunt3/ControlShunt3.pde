@@ -37,9 +37,19 @@ color lightgreen  = color(120,255,120); //
 color lightblue  = color(0,255,255); //Trad-in
 color lightyellow = color(255,255,120); //
 color grey = color(230,230,230);
+/*create a matrix that holds all data
+0 - TempOutside
+1 - TempRadIn
+2 - TempRadOut
+3 - TempTapwaterOut
+4 - TempRadOutSet
+5 - SetValve*/
+float[][] PelletsData = new float[1000*7/8-1000/16+2][6];
+
+
 float[] tempHistory = new float[1000*7/8-1000/16+2];
 
-
+//==============================================================================================================================================
 
 void setup() {
 
@@ -137,64 +147,68 @@ void setup() {
     k=0;
 }// end setup()
 
-
-
-
-
-
+//==============================================================================================================================================
 
 void draw() {
   delay(100);
-  float ypoint;
-  float oldpoint;
-  float newpoint;
-  int index;
+  float ypoint=0;
+  float oldpoint=0;
+  float newpoint=0;
+  int index=0;
   if (mousePressed){
     mouseclick();
   }
-  // Reset graph
 restoregraph();
-
- //draw graph
  
-  ypoint = ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa));
-  //println(ypoint); //<>//
+ for (k=0; k<6; k++){
+   switch(k){
+     case 0:
+       ypoint = 1.0*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
+       stroke(black);
+       break;
+     case 1:
+       ypoint = 1.1*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
+       stroke(red);
+       break;
+     case 2:
+       ypoint = 1.2*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
+       stroke(green);
+       break;
+     case 3:
+       ypoint = 1.3*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
+       stroke(blue);
+       break;
+     case 4:
+       ypoint = 1.4*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
+       stroke(yellow);
+       break;
+     case 5:
+       ypoint = 1.5*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
+       stroke(lightblue);
+       break;
+   }
+ //<>//
   newpoint = ypoint;
-  //println(newpoint);
   for (index = 0; index<xb-xa+1; index++){ //<>//
-    oldpoint=tempHistory[index+1];
-    tempHistory[index+1] = newpoint;
-    //println(tempHistory[index+1]);
+    oldpoint=PelletsData[index+1][k];
+    PelletsData[index+1][k] = newpoint;
     newpoint = oldpoint;
-    //println(tempHistory);
   }
-  tempHistory[0] = ypoint;
+  PelletsData[0][k] = ypoint;
   strokeWeight(3);
-  stroke(black);
   fill(black);
   for (index = 1; index<xb-xa; index++){
-    /*for(int yindex = 0 ; yindex < abs(tempHistory[index-1]-tempHistory[index]); yindex++){
-      point (xa+index, tempHistory[index-1]+tempHistory[index-1]-tempHistory[index]);
-    }*/
-    if (tempHistory[index] > 0 ){
-      /*point (lerp(xa, xa+index, 0.25), lerp(tempHistory[index-1], tempHistory[index], 0.25));
-      point (lerp(xa, xa+index, 0.5), lerp(tempHistory[index-1], tempHistory[index], 0.5));
-      point (lerp(xa, xa+index, 0.75), lerp(tempHistory[index-1], tempHistory[index], 0.75));*/
-      //println(tempHistory[index]);
-      point (xa+index, tempHistory[index]);
+    if (PelletsData[index][k] > 0 ){
+      point (xa+index, PelletsData[index][k]);
     }
   }
+  }
   n++;
+  println(n);
   index =0;
 }
 
-
-
-
-
-
-
-
+//==============================================================================================================================================
 
 void mouseclick(){
   int delaytime=500;
@@ -252,6 +266,8 @@ void mouseclick(){
  restorebox();
 }
 
+//==============================================================================================================================================
+
 void restorebox(){
   stroke(grey);
   strokeWeight(1);
@@ -297,6 +313,8 @@ void restorebox(){
   text(nf(d,1,1), xa+5*xboxdiff+32, ya/4+ybox/2+5);// Draw the T1 + text
 }
 
+//==============================================================================================================================================
+
 void restoregraph(){
   stroke(black);
   strokeWeight(1);
@@ -304,5 +322,7 @@ void restoregraph(){
   rect(xa, ya, xb-xa, yb-ya);
 }
 
-void drappoint(){
+//==============================================================================================================================================
+
+void drawpoint(){
 }
