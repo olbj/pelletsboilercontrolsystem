@@ -126,8 +126,8 @@ void setup() {
   textSize(14);
   n = 0;
   k = 0;
-  for(y=yb ; y>=ya ; y=y-(yb-ya)/100) {
-    if ( n == 5*k) {text(n, xa/2, y+5);}// Draw the 0 at the bottom under the line
+  for(y=yb ; y>=ya ; y=y-(yb-ya)/120) {
+    if ( n == 5*k) {text(n-20, xa/2, y+5);}// Draw the 0 at the bottom under the line
     n++;
     if ( n == 5*(k+1)) {k++;}
   }
@@ -159,31 +159,37 @@ void draw() {
     mouseclick();
   }
 restoregraph();
- 
+ /*Collect data the PelletsData-array
+0 - TempOutside
+1 - TempRadIn
+2 - TempRadOut
+3 - TempTapwaterOut
+4 - TempRadOutSet
+5 - SetValve*/
  for (k=0; k<6; k++){
    switch(k){
-     case 0:
-       ypoint = 1.0*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
+     case 0: //TempOutside
+       ypoint = yb-(tout+20.0)/120.0*(yb-ya);
        stroke(black);
        break;
-     case 1:
-       ypoint = yb-60.0/100.0*(yb-ya);
+     case 1: //TempRadIn
+       ypoint = yb-(60.0+20.0)/120.0*(yb-ya);
        println(ypoint);
        stroke(red);
        break;
-     case 2:
+     case 2: //TempRadOut
        ypoint = 1.2*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
        stroke(green);
        break;
-     case 3:
+     case 3: //TempTapwaterOut
        ypoint = 1.3*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
        stroke(blue);
        break;
-     case 4:
-       ypoint = 1.4*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
+     case 4: //TempRadOutSet
+       ypoint = yb-(trad+20.0)/120.0*(yb-ya);
        stroke(yellow);
        break;
-     case 5:
+     case 5: //SetValve 0 - 255
        ypoint = 1.5*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
        stroke(lightblue);
        break;
