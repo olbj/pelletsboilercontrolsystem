@@ -167,7 +167,8 @@ restoregraph();
        stroke(black);
        break;
      case 1:
-       ypoint = 1.1*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
+       ypoint = yb-60.0/100.0*(yb-ya);
+       println(ypoint);
        stroke(red);
        break;
      case 2:
