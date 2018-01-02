@@ -20,8 +20,9 @@
 import processing.serial.*; //import the Serial library
 
 Serial port; // Create object from Serial class
-int x,xtext,y,n,j,k,val,val1,mousedown,tid,fan, valold;
+int x,xtext,y,val,val1,mousedown,tid,fan, valold;
 int trad,tout;
+  int n, k; //counters
 float p,i,d;
 int count1,count2,count,counting, energytab;
 int xdisp,ydisp,xa,xb,ya,yb,xbox,ybox,xboxdiff;
@@ -52,6 +53,7 @@ float[] tempHistory = new float[1000*7/8-1000/16+2];
 //==============================================================================================================================================
 
 void setup() {
+
 
   println(Serial.list()); // prints the active COM-port list
   String arduinoPort = Serial.list()[3]; //Update this according to listning in consol
@@ -155,19 +157,63 @@ void draw() {
   float ypoint=0;
   float oldpoint=0;
   float newpoint=0;
-  int index=0, val=0;
+  int index=0, val0=255, val1=0;
   if (mousePressed){
     mouseclick();
   }
-restoregraph();
+//restoregraph();
  /*Collect data the PelletsData-array
 0 - TempOutside
 1 - TempRadIn
 2 - TempRadOut
 3 - TempTapwaterOut
 4 - TempRadOutSet
-5 - SetValve*/
- ypoint = yb-getpoint(0)*(yb-ya)/255;
+5 - SetValve
+6 - TempOutsideSet
+7 - Mode 0: Auto, 1: TempRadOutSet, 2: TempOutsideSet, 3: Off, 4: Valve exercise
+8 - P
+9 - I
+10 - D
+*/
+  if (port.available() > 0) { //<>//
+   val0=port.read();
+   val1=port.read();
+   ypoint=(yb-val1*(yb-ya)/255);
+    switch(val0){
+      case 0: //TempOutside
+        updateindex(ypoint, val0);
+        stroke(black);
+        printgraph(val0);
+        break;
+     case 1: //TempOutside
+        updateindex(ypoint, val0);
+        stroke(red);
+        printgraph(val0);
+        break;
+     case 2: //TempOutside
+        updateindex(ypoint, val0);
+        stroke(blue);
+        printgraph(val0);
+        break;
+     case 3: //TempOutside
+        updateindex(ypoint, val0);
+        stroke(green);
+        printgraph(val0);
+        break;
+     case 4: //TempOutside
+        updateindex(ypoint, val0);
+        stroke(yellow);
+        printgraph(val0);
+        break;
+     case 5: //Valve signal
+        updateindex(ypoint, val0);
+        stroke(lightred);
+        printgraph(val0);
+        break;
+    }
+
+  }
+ /*ypoint = yb-getpoint(0)*(yb-ya)/255;
  val = k;
  for (k=0; k<6; k++){
    switch(k){
@@ -197,7 +243,7 @@ restoregraph();
     PelletsData[index+1][k] = newpoint;
     newpoint = oldpoint;
   }
-  PelletsData[0][j] = ypoint;
+  PelletsData[0][k] = ypoint;
   strokeWeight(3);
   fill(black);
   for (index = 1; index<xb-xa; index++){
@@ -208,7 +254,7 @@ restoregraph();
   }
   n++;
   //println(n);
-  index =0;
+  index =0;*/
 }
 
 //==============================================================================================================================================
@@ -330,17 +376,29 @@ void restoregraph(){
 
 //==============================================================================================================================================
 
-int getpoint(int gety){
-  if (port.available() > 0) {
-    k=port.read();
-    gety = port.read();
-    println(k);
-    println(gety);
-  } 
-  return gety;   
+void updateindex(float ypoint, int k){
+  
+  int index;
+  float newpoint, oldpoint;
+  
+  newpoint = ypoint;
+  for (index = 0; index<xb-xa+1; index++){
+    oldpoint=PelletsData[index+1][k];
+    PelletsData[index+1][k] = newpoint;
+    newpoint = oldpoint;
+  }
+  PelletsData[0][k] = ypoint;
 }
 
 //==============================================================================================================================================
 
-void givedata(){
-}
+void printgraph(int k) {
+  int index = 1;
+  strokeWeight(3);
+  fill(black);
+  for (index = 1; index<xb-xa; index++){
+    if (PelletsData[index][k] > 0 ){
+      point (xa+index, PelletsData[index][k]);
+    }
+  }
+  }

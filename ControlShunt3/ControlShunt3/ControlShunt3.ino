@@ -63,7 +63,7 @@ double kCurve=0, mCurve=0;
 // Define Temperature variables. 
 // TempRadOutMin = T,ie and defines outside temeparture when valve opens.
 double TempOutside, TempRadIn, TempRadOut, TempTapwaterOut;
-double TempRadOutMin=17, TempRadOutMax=80, TempOutsideMin=-24, TempManual=-5;
+double TempRadOutMin=17, TempRadOutMax=80, TempOutsideMin=-24, TempOutsideManual=-5, TempRadManual=45;
 
 //Specify the links and initial tuning parameters
 PID myPID(&TempRadOut, &Output, &TempRadOutSet, consKp, consKi, consKd, DIRECT);
@@ -259,46 +259,47 @@ void printData(DeviceAddress deviceAddress)
 void loop()
 {
   switch (RunMode) {
-  case 3:
-    //Serial.print("Entering setup mode");
-    //Serial.println();
-    break; 
-  case 2:
+  case 4:
     //Serial.print("Entering valve exercise mode");
     //Serial.println();
+    break:
+  case 3:
+    //Serial.print("Switching off");
+    //Serial.println();
+    TempOutside=50;
+    TempRadOutSet = int (kCurve*TempOutside+mCurve+0.5);
+    break; 
+  case 2:
+    //Serial.print("Manaul Temp outside set mode");
+    //Serial.println();
+    TempOutside=TempOutsideManual;
+    TempRadOutSet = int (kCurve*TempOutside+mCurve+0.5);
     break; 
   case 1:
-    /*Serial.print("Entering manual operation mode");
-    Serial.println();*/
+    //Serial.print("Entering Temp radout set mode");
+    //Serial.println();
+    TempRadOutSet=TempRadManual;
     break; 
   case 0:
     //Serial.print("Entering automatic operation mode");
     //Serial.println();
+    TempOutside=sensors.getTempC(outsideThermometer);
+    TempRadOutSet = int (kCurve*TempOutside+mCurve+0.5);
     break; 
   }
 
-  //First phase: Set up the debug variables. TempRadOut is simulated by pin 0
-  // call sensors.requestTemperatures() to issue a global temperature 
-  // request to all devices on the bus
-  //Serial.print("Requesting temperatures...");
   sensors.requestTemperatures();
-  //Serial.println("DONE");
-
-  if (RunMode == 0) TempOutside=sensors.getTempC(outsideThermometer);
-  //Update the line below when manual setup interface is programmed.
-  if (RunMode == 1) TempOutside=TempManual;
-  /*TempsimVal = analogRead(TempsimPin);
-  TempRadOut = TempsimVal/1023.0*(TempRadOutMax-TempRadOutMin)+TempRadOutMin;*/
-  TempRadOut=int (sensors.getTempC(radiatoroutThermometer)+0.5);
+  
   Iteration += 1;
   delay(DelayTime);
-
+    
+  TempRadOut=int (sensors.getTempC(radiatoroutThermometer)+0.5);
   Input = TempRadOut;
   //Tempcurve: TempRadOutSet=kCurve*TempOutside+mCurve
-  TempRadOutSet = int (kCurve*TempOutside+mCurve+0.5);
+
   
   double gap = abs(TempRadOutSet-Input); //distance away from TempRadOutSet
-  if(gap<9)
+  if(gap<99)
   {  //we're close to TempRadOutSet, use conservative tuning parameters
     myPID.SetTunings(consKp, consKi, consKd);
   }
@@ -317,7 +318,7 @@ void loop()
    analogWrite(ValveControlPin,SetValve);
 
   //Debug printing
-  delay(20);
+  //delay(20);
   // call sensors.requestTemperatures() to issue a global temperature 
   // request to all devices on the bus
   /*Serial.print("Requesting temperatures...");
@@ -359,7 +360,7 @@ void loop()
   //Write to serial port
   Serial.write(0); //Tempoutside
   int temp;
-  temp = 15.0*255.0/120.0+0.5;
+  temp = TempRadOut*255.0/120.0+0.5;
   Serial.write(temp); //Temperature outside
   Serial.write(1); //Temp radin
   temp = 37.0*255.0/120.0+0.5;
@@ -371,9 +372,10 @@ void loop()
   temp = 55.0*255.0/120.0+0.5;
   Serial.write(temp); //Temp tapwater
   Serial.write(4); //Temp radset
-  temp = 60.0*255.0/120.0+0.5;
+  temp = TempRadOutSet*255.0/120.0+0.5;
   Serial.write(temp); //Temp radset
   Serial.write(5); //Temp radset
-  temp = 90.0*255.0/120.0+0.5;
+  temp = (20.0+ SetValve/255.0*100.0)*255.0/120.0+0.5;
   Serial.write(temp); //Temp radset
+  //delay(100);
 }
