@@ -20,12 +20,12 @@
 import processing.serial.*; //import the Serial library
 
 Serial port; // Create object from Serial class
-int x,xtext,y,n,k,val,val1,mousedown,tid,fan, valold;
+int x,xtext,y,n,j,k,val,val1,mousedown,tid,fan, valold;
 int trad,tout;
 float p,i,d;
 int count1,count2,count,counting, energytab;
 int xdisp,ydisp,xa,xb,ya,yb,xbox,ybox,xboxdiff;
-String boxtext;
+String boxtext, runmode;
 
 color red = color(255,0,0); // PID-signal
 color green = color(0,255,0); //Ttap-out
@@ -53,7 +53,7 @@ float[] tempHistory = new float[1000*7/8-1000/16+2];
 
 void setup() {
 
-  //println(Serial.list()); // prints the active COM-port list
+  println(Serial.list()); // prints the active COM-port list
   String arduinoPort = Serial.list()[3]; //Update this according to listning in consol
   
   port = new Serial(this, arduinoPort, 115200);
@@ -64,6 +64,7 @@ void setup() {
   p=3;
   i=1;
   d=1;
+  runmode = "Auto";
   
   //fill(0); //<>//
   xdisp=1000;
@@ -154,7 +155,7 @@ void draw() {
   float ypoint=0;
   float oldpoint=0;
   float newpoint=0;
-  int index=0;
+  int index=0, val=0;
   if (mousePressed){
     mouseclick();
   }
@@ -166,42 +167,37 @@ restoregraph();
 3 - TempTapwaterOut
 4 - TempRadOutSet
 5 - SetValve*/
+ ypoint = yb-getpoint(0)*(yb-ya)/255;
+ val = k;
  for (k=0; k<6; k++){
    switch(k){
      case 0: //TempOutside
-       ypoint = yb-(tout+20.0)/120.0*(yb-ya);
        stroke(black);
        break;
      case 1: //TempRadIn
-       ypoint = yb-(60.0+20.0)/120.0*(yb-ya);
-       println(ypoint);
        stroke(red);
        break;
      case 2: //TempRadOut
-       ypoint = 1.2*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
        stroke(green);
        break;
      case 3: //TempTapwaterOut
-       ypoint = 1.3*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
        stroke(blue);
        break;
      case 4: //TempRadOutSet
-       ypoint = yb-(trad+20.0)/120.0*(yb-ya);
        stroke(yellow);
        break;
      case 5: //SetValve 0 - 255
-       ypoint = 1.5*(ya+(yb-ya)/2+30*sin(PI*15*n/(xb-xa)));
        stroke(lightblue);
        break;
    }
- //<>//
+
   newpoint = ypoint;
-  for (index = 0; index<xb-xa+1; index++){ //<>//
+  for (index = 0; index<xb-xa+1; index++){
     oldpoint=PelletsData[index+1][k];
     PelletsData[index+1][k] = newpoint;
     newpoint = oldpoint;
   }
-  PelletsData[0][k] = ypoint;
+  PelletsData[0][j] = ypoint;
   strokeWeight(3);
   fill(black);
   for (index = 1; index<xb-xa; index++){
@@ -211,7 +207,7 @@ restoregraph();
   }
   }
   n++;
-  println(n);
+  //println(n);
   index =0;
 }
 
@@ -219,16 +215,16 @@ restoregraph();
 
 void mouseclick(){
   int delaytime=500;
-   if (mousePressed && mouseX<xa+2.5*xbox && mouseX>xa && mouseY<ya/4+ybox && mouseY>ya/4 ){ //Mode start
-     if (k == 0){
-       fill(255, 91, 91);
-       k=1;}
-       else{
-       fill(255, 255, 255);
-       k=0;}
-       noStroke();
-       rect(xa, ya/4, 2.5*xbox, ybox);
-  delay(delaytime);
+   if (mousePressed && mouseX<xa+2.5*xbox && mouseX>xa && mouseY<ya/4+ybox && mouseY>ya/4 ){ //Mode start //<>//
+     if (runmode == "Auto"){
+       runmode= "Radtemp";}
+       else if (runmode =="Radtemp"){
+         runmode = "Outtemp";}
+       else if (runmode =="Outtemp"){
+         runmode = "Off";}
+       else {
+         runmode = "Auto";}
+  delay(delaytime); //<>//
  }//Mode end
   if (mousePressed && mouseX<xa+xboxdiff+xbox && mouseX>xa+xboxdiff && mouseY<ya/4+ybox && mouseY>ya/4 ){ //Trad- xa+xboxdiff, ya/4, xbox, ybox
        trad--;
@@ -313,6 +309,9 @@ void restorebox(){
   text("+", xa+4*xboxdiff+70, ya/8+25);// Draw the T1 + text
   text("+", xa+5*xboxdiff+70, ya/8+25);// Draw the T1 + text
   textSize(14);
+  textAlign(CENTER);
+  text(runmode, xa+0*xboxdiff+50, ya/4+ybox/2+5);
+  textAlign(LEFT);
   text(nf(trad,2), xa+1*xboxdiff+32, ya/4+ybox/2+5);// Draw the T1 + text
   text(nf(tout,2), xa+2*xboxdiff+32, ya/4+ybox/2+5);// Draw the T1 + text
   text(nf(p,1,1), xa+3*xboxdiff+32, ya/4+ybox/2+5);// Draw the T1 + text
@@ -331,5 +330,17 @@ void restoregraph(){
 
 //==============================================================================================================================================
 
-void drawpoint(){
+int getpoint(int gety){
+  if (port.available() > 0) {
+    k=port.read();
+    gety = port.read();
+    println(k);
+    println(gety);
+  } 
+  return gety;   
+}
+
+//==============================================================================================================================================
+
+void givedata(){
 }
