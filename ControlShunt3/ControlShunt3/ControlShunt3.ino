@@ -71,6 +71,11 @@ PID myPID(&TempRadOut, &Output, &TempRadOutSet, consKp, consKi, consKd, DIRECT);
 //Specify operation mode: RunMode=0: Automatic, RunMode=1: Manual, RunMode=2: Off
 int RunMode=1;
 
+  const byte numChars = 32;
+  char receivedChars[numChars];   // an array to store the received data
+  boolean newData = false;
+  int dataNumber = 0;             // new for this version
+
 void setup()
 {
   //Open serial print for debug printing
@@ -122,7 +127,7 @@ void setup()
   //Serial.print(TempRadOutSet);
   //Serial.println();
   //Serial.println();
-  delay(5000); 
+  //delay(5000); 
   
   // Start up the library
   sensors.begin();
@@ -171,21 +176,21 @@ void setup()
   //if (!oneWire.search(outsideThermometer)) Serial.println("Unable to find address for outsideThermometer");
 
   // show the addresses we found on the bus
-  //Serial.print("Device 0 Address: ");
-  printAddress(radiatorinThermometer);
-  //Serial.println();
+  Serial.print("Device 0 Address: ");
+  //printAddress(radiatorinThermometer);
+  Serial.println();
 
-  //Serial.print("Device 1 Address: ");
-  printAddress(radiatoroutThermometer);
-  //Serial.println();
+  Serial.print("Device 1 Address: ");
+  //printAddress(radiatoroutThermometer);
+  Serial.println();
 
-  //Serial.print("Device 2 Address: ");
-  printAddress(tapwaterThermometer);
-  //Serial.println();
+  Serial.print("Device 2 Address: ");
+  //printAddress(tapwaterThermometer);
+  Serial.println();
 
-  //Serial.print("Device 3 Address: ");
-  printAddress(outsideThermometer);
-  //Serial.println();
+  Serial.print("Device 3 Address: ");
+  //printAddress(outsideThermometer);
+  Serial.println();
 
   // set the resolution to 9 bit
   sensors.setResolution(radiatorinThermometer, TEMPERATURE_PRECISION);
@@ -248,13 +253,48 @@ void printResolution(DeviceAddress deviceAddress)
 // main function to print information about a device
 void printData(DeviceAddress deviceAddress)
 {
-  //Serial.print("Device Address: ");
+  Serial.print("Device Address: ");
   printAddress(deviceAddress);
-  //Serial.print(" ");
+ Serial.print(" ");
   printTemperature(deviceAddress);
-  //Serial.println();
+  Serial.println();
 }
 
+void recvWithEndMarker() {
+    static byte ndx = 0;
+    char endMarker = '\n';
+    char rc;
+   
+    if (Serial.available() > 0) {
+        rc = Serial.read();
+
+        if (rc != endMarker) {
+            receivedChars[ndx] = rc;
+            ndx++;
+            if (ndx >= numChars) {
+                ndx = numChars - 1;
+            }
+        }
+        else {
+            receivedChars[ndx] = '\0'; // terminate the string
+            ndx = 0;
+            newData = true;
+        }
+    }
+}
+
+void showNewNumber() {
+    if (newData == true) {
+        dataNumber = 0;             // new for this version
+        dataNumber = atoi(receivedChars);   // new for this version
+        SetValve = dataNumber;
+        Serial.print("This just in ... ");
+        Serial.println(receivedChars);
+        Serial.print("Data as Number ... ");    // new for this version
+        Serial.println(dataNumber);     // new for this version
+        newData = false;
+    }
+}
 
 void loop()
 {
@@ -262,7 +302,7 @@ void loop()
   case 4:
     //Serial.print("Entering valve exercise mode");
     //Serial.println();
-    break:
+    break;
   case 3:
     //Serial.print("Switching off");
     //Serial.println();
@@ -290,8 +330,8 @@ void loop()
 
   sensors.requestTemperatures();
   
-  Iteration += 1;
-  delay(DelayTime);
+  //Iteration += 1;
+  //delay(DelayTime);
     
   TempRadOut=int (sensors.getTempC(radiatoroutThermometer)+0.5);
   Input = TempRadOut;
@@ -310,8 +350,8 @@ void loop()
   }
   
   myPID.Compute();
-  SetValve = int (Output+0.5);
-//   SetValve += int(Output - LastOutput + 0.5);
+  //SetValve = int (Output+0.5);
+  //SetValve += int(Output - LastOutput + 0.5);
    if(SetValve > 255) SetValve = 255;
    if(SetValve < 0) SetValve = 0;
    //LastOutput = Output;
@@ -321,9 +361,9 @@ void loop()
   //delay(20);
   // call sensors.requestTemperatures() to issue a global temperature 
   // request to all devices on the bus
-  /*Serial.print("Requesting temperatures...");
+  Serial.print("Requesting temperatures...");
   sensors.requestTemperatures();
-  Serial.println("DONE");*/
+  Serial.println("DONE");
 
   // print the device information
   /*printData(radiatorinThermometer);
@@ -336,28 +376,34 @@ void loop()
   Serial.print("TempsimVal: ");
   Serial.print(TempsimVal);
   Serial.println();*/
-  //Serial.print("TempRadOut: ");
-  //Serial.print(TempRadOut);
-  //Serial.println();
+  Serial.print("TempRadOut: ");
+  Serial.print(TempRadOut);
+  Serial.println();
   /*Serial.print("TempOutside: ");
   Serial.print(TempOutside);
+  Serial.println();
+  Serial.print("TempRadOutSet: ");
+  Serial.print(TempRadOutSet);
+  Serial.println();
+  Serial.print("Output: ");
+  Serial.print(Output);
+  Serial.println();
+  Serial.print("Output - LastOutput: ");
+  Serial.print(Output-LastOutput);
   Serial.println();*/
-  //Serial.print("TempRadOutSet: ");
-  //Serial.print(TempRadOutSet);
-  //Serial.println();
-  //Serial.print("Output: ");
-  //Serial.print(Output);
-  //Serial.println();
-  //Serial.print("Output - LastOutput: ");
-  //Serial.print(Output-LastOutput);
-  //Serial.println();
-  //Serial.print("SetValve: ");
-  //Serial.print(SetValve);
-  //Serial.println();
-  //Serial.println();
+  Serial.print("SetValve: ");
+  Serial.print(SetValve);
+  Serial.println();
+  //Serial.println();*/155
+  
+
+  recvWithEndMarker();
+  showNewNumber();
+
+  
   LastOutput = Output;
 
-  //Write to serial port
+  /*Write to serial port
   Serial.write(0); //Tempoutside
   int temp;
   temp = TempRadOut*255.0/120.0+0.5;
@@ -377,5 +423,5 @@ void loop()
   Serial.write(5); //Temp radset
   temp = (20.0+ SetValve/255.0*100.0)*255.0/120.0+0.5;
   Serial.write(temp); //Temp radset
-  //delay(100);
+  //delay(100);*/
 }
