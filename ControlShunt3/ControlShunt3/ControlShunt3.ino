@@ -63,7 +63,7 @@ double kCurve=0, mCurve=0;
 // Define Temperature variables. 
 // TempRadOutMin = T,ie and defines outside temeparture when valve opens.
 double TempOutside, TempRadIn, TempRadOut, TempTapwaterOut;
-double TempRadOutMin=17, TempRadOutMax=80, TempOutsideMin=-24, TempOutsideManual=-5, TempRadManual=45;
+double TempRadOutMin=17, TempRadOutMax=80, TempOutsideMin=-24, TempOutsideManual=-5, TempRadManual=55;
 
 //Specify the links and initial tuning parameters
 PID myPID(&TempRadOut, &Output, &TempRadOutSet, consKp, consKi, consKd, DIRECT);
@@ -156,10 +156,10 @@ void setup()
   // the devices on your bus (and assuming they don't change).
   // 
   // method 1: by index
-  /*if (!sensors.getAddress(radiatorinThermometer, 0)) Serial.println("Unable to find address for Device 0"); 
+  if (!sensors.getAddress(radiatorinThermometer, 0)) Serial.println("Unable to find address for Device 0"); 
   if (!sensors.getAddress(radiatoroutThermometer, 1)) Serial.println("Unable to find address for Device 0"); 
   if (!sensors.getAddress(tapwaterThermometer, 2)) Serial.println("Unable to find address for Device 0"); 
-  if (!sensors.getAddress(outsideThermometer, 3)) Serial.println("Unable to find address for Device 1"); */
+  if (!sensors.getAddress(outsideThermometer, 3)) Serial.println("Unable to find address for Device 1");
 
   // method 2: search()
   // search() looks for the next device. Returns 1 if a new address has been
@@ -316,8 +316,8 @@ void loop()
     TempRadOutSet = int (kCurve*TempOutside+mCurve+0.5);
     break; 
   case 1:
-    //Serial.print("Entering Temp radout set mode");
-    //Serial.println();
+    Serial.print("Entering Temp radout set mode");
+    Serial.println();
     TempRadOutSet=TempRadManual;
     break; 
   case 0:
@@ -366,7 +366,7 @@ void loop()
   Serial.println("DONE");
 
   // print the device information
-  /*printData(radiatorinThermometer);
+  printData(radiatorinThermometer);
   printData(radiatoroutThermometer);
   printData(tapwaterThermometer);
   printData(outsideThermometer);
@@ -375,11 +375,11 @@ void loop()
   Serial.println();
   Serial.print("TempsimVal: ");
   Serial.print(TempsimVal);
-  Serial.println();*/
+  Serial.println();
   Serial.print("TempRadOut: ");
   Serial.print(TempRadOut);
   Serial.println();
-  /*Serial.print("TempOutside: ");
+  Serial.print("TempOutside: ");
   Serial.print(TempOutside);
   Serial.println();
   Serial.print("TempRadOutSet: ");
@@ -390,11 +390,11 @@ void loop()
   Serial.println();
   Serial.print("Output - LastOutput: ");
   Serial.print(Output-LastOutput);
-  Serial.println();*/
+  Serial.println();
   Serial.print("SetValve: ");
   Serial.print(SetValve);
   Serial.println();
-  //Serial.println();*/155
+  //Serial.println();155
   
 
   recvWithEndMarker();
