@@ -25,27 +25,27 @@
 #include <AFMotor.h>
 #include <AutoPID.h>
 
+
 // Section Variables
 // ****************
 const double radiatorinTempMin=17, radiatoroutTempMax=80, outsideTempMin=-24, outsideTempManual=-5;
-const int temp_read_delay = 800, output_min = 0, output_max = 255;
 
-double setPoint = 50, outputVal; //Setpoint temperature and output from PID
-double radiatoroutTempManual=55; // Manual radiator temperature setpoint for debug purpose
-double radiatorinTemp, radiatoroutTemp, outsideTemp; //21-12-26 outsideTemp not implemented
+double setPoint = 50, outputVal = 0; //Setpoint temperature
+double radiatoroutTempManual=45; // Manual radiator temperature setpoint for debug purpose
+double radiatorinTemp = 20, radiatoroutTemp = 30, outsideTemp = -10; //21-12-26 outsideTemp not implemented
 
 double kCurve=0, mCurve=0; // 21-12-26 Temperature curve not implemented
-double KP=0.5, KI=0.15, KD=0.40;
+double Kp = 8, Ki = 0, Kd = 0;
+const double output_min=0, output_max=255;
+const int temp_read_delay=800;
 unsigned long lastTempUpdate; //tracks clock time of last temp update
-
-AutoPID myPID(&radiatoroutTemp, &setPoint, &outputVal, output_min, output_max, KP, KI, KD);
 
 // arrays to hold device addresses
 //DeviceAddress radiatorinTempSensor, radiatoroutTempSensor, outsideTempSensor;
 DeviceAddress radiatorinTempSensor = { 0x28, 0xBD, 0x20, 0x7A, 0x05, 0x00, 0x00, 0x2D }; //Yellow
 DeviceAddress radiatoroutTempSensor = { 0x28, 0x17, 0xC1, 0x47, 0x05, 0x00, 0x00, 0x7C }; //Green
 DeviceAddress outsideTempSensor = { 0x28, 0xEF, 0xEA, 0x46, 0x05, 0x00, 0x00, 0xA8 }; //Red
-
+// Section Variables end
 
 // Section Temperature sensors (assmuing three sensors atatched)
 // *************************************************************
@@ -62,6 +62,11 @@ DallasTemperature sensors(&oneWire);
 // ********************
 AF_DCMotor motor(1);
 // Section Motor Shield end
+
+// Section PID init
+// *****************
+AutoPID myPID(&radiatoroutTemp, &setPoint, &outputVal, output_min, output_max, Kp, Ki, Kd);
+// Section PID init end
 
 void setup(void)
 {
@@ -92,7 +97,7 @@ void setup(void)
   // Section PID
   // ***********
   //if temperature is more than 4 degrees below or above setpoint, OUTPUT will be set to min or max respectively
-  myPID.setBangBang(4);
+  myPID.setBangBang(40);
   //set PID update interval to 4000ms
   myPID.setTimeStep(4000);
   // Section PID end
@@ -107,13 +112,27 @@ void loop(void)
     radiatoroutTemp = sensors.getTempC(radiatoroutTempSensor); //get temp reading
     lastTempUpdate = millis();
     sensors.requestTemperatures(); //request reading for next time
-  } 
+  }
+  
+  int sensorValue = analogRead(A2);
+  //radiatoroutTemp = sensorValue*(85.0-20.0) / 1023.0+20.0;
+  Kp = sensorValue* 10.0 / 1023.0;
   setPoint = radiatoroutTempManual; //Manual setupoint specified in definition
+  myPID.setGains(Kp, Ki, Kd);
   myPID.run();
   motor.setSpeed(outputVal);
-  Serial.println(radiatoroutTempManual);
-  Serial.println(radiatoroutTemp);
-  Serial.println(outputVal);
+  
+  Serial.print("Output from PID: Setpoint=");
+  Serial.print(radiatoroutTempManual);
+  Serial.print("°C Value=");
+  Serial.print(radiatoroutTemp);
+  Serial.print("°C Output=");
+  Serial.print(outputVal);
+  Serial.print(" Target=");
+  Serial.print(myPID.atSetPoint(2));
+  Serial.print(" Kp=");
+  Serial.print(Kp);
+  Serial.println();
 
 // loop end
 }
