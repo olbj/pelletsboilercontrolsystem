@@ -1,9 +1,11 @@
 /**************************************************************************************
   PID Adaptive radiator temperature control system
+  
+  Version 4.0 21-12-27
+  
   Code made by Olof Björkqvist (olof@bjorkqvist.nu)
-  Code sorce from PID Example code for adptive control
-  Code source http://milesburton.com/Main_Page?title=Dallas_Temperature_Control_Library
-
+  Code sources: PID Example codes for DallasTemperature and AutoPID libraries
+  
   Copyright (C) 2021  Olof Björkqvist <olof@bjorkqvist.nu>
 
   This program is free software: you can redistribute it and/or modify
@@ -31,12 +33,13 @@
 const double radiatorinTempMin=17, radiatoroutTempMax=80, outsideTempMin=-24, outsideTempManual=-5;
 
 double setPoint = 50, outputVal = 0; //Setpoint temperature
-double radiatoroutTempManual=45; // Manual radiator temperature setpoint for debug purpose
+double radiatoroutTempManual=55; // Manual radiator temperature setpoint for debug purpose
 double radiatorinTemp = 20, radiatoroutTemp = 30, outsideTemp = -10; //21-12-26 outsideTemp not implemented
 
 double kCurve=0, mCurve=0; // 21-12-26 Temperature curve not implemented
-double Kp = 8, Ki = 0, Kd = 0;
-const double output_min=0, output_max=255;
+// 21-12-27 Stable and conservative values double Kp = 6.0, Ki = 0.6, Kd = 3.0;
+double Kp = 10.0, Ki = 0.3, Kd = 6.0;
+const double output_min=0, output_max=230;
 const int temp_read_delay=800;
 unsigned long lastTempUpdate; //tracks clock time of last temp update
 
@@ -91,7 +94,7 @@ void setup(void)
   Serial.println("Motor test!");
   // turn on motor
   motor.setSpeed(128);
-  motor.run(FORWARD); //Make shure that the polarity is correct.
+  motor.run(BACKWARD); //Make shure that the polarity is correct.
   // Section Motor Shield end
 
   // Section PID
@@ -116,9 +119,11 @@ void loop(void)
   
   int sensorValue = analogRead(A2);
   //radiatoroutTemp = sensorValue*(85.0-20.0) / 1023.0+20.0;
-  Kp = sensorValue* 10.0 / 1023.0;
-  setPoint = radiatoroutTempManual; //Manual setupoint specified in definition
-  myPID.setGains(Kp, Ki, Kd);
+  //Kp = sensorValue* 50.0 / 1023.0 +0.0;
+  //Ki = sensorValue* 2.0 / 1023.0 +0.0;
+  //Kd = sensorValue* 10.0 / 1023.0 +0.0;
+  //myPID.setGains(Kp, Ki, Kd);
+  setPoint = radiatoroutTempManual; //Manual setpoint specified in definition
   myPID.run();
   motor.setSpeed(outputVal);
   
@@ -132,6 +137,10 @@ void loop(void)
   Serial.print(myPID.atSetPoint(2));
   Serial.print(" Kp=");
   Serial.print(Kp);
+  Serial.print(" Ki=");
+  Serial.print(Ki);
+  Serial.print(" Kd=");
+  Serial.print(Kd);
   Serial.println();
 
 // loop end
